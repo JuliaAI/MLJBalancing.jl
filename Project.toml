@@ -1,0 +1,26 @@
+name = "MLJBalancing"
+uuid = "45f359ea-796d-4f51-95a5-deb1a414c586"
+authors = ["Essam <essamwisam@outlook.com> and contributors"]
+version = "1.0.0-DEV"
+
+[deps]
+MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
+MLJModelInterface = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
+OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+
+[compat]
+julia = "1"
+MLJBase = "0.21"
+MLJModelInterface = "1.9"
+OrderedCollections = "1.6"
+
+[extras]
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Imbalance = "c709b415-507b-45b7-9a3d-1767c89fde68"
+MLJLIBSVMInterface = "61c7150f-6c77-4bb1-949c-13197eac2a52"
+MLJLinearModels = "6ee0df7b-362f-4a72-a706-9e79364fb692"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "Imbalance", "DataFrames", "MLJLIBSVMInterface", "MLJLinearModels"]
