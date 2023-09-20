@@ -9,3 +9,4 @@ using Random
 using DataFrames
 
 
+include("BalancedModel.jl")
