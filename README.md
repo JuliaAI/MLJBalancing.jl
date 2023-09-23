@@ -28,7 +28,9 @@ logistic_model = LogisticClassifier()
 ```julia
 balanced_model = BalancedModel(model=logistic_model, balancer1=oversampler, balancer2=undersampler)
 ```
-Here data will be passed to balancer1 then balancer2 and then the model. In general, there can be any number of balancers.
+Here training data will be passed to `balancer1` then `balancer2`, whose output is used to train the classifier `model`.  In prediction, the resamplers `balancer1` and `blancer2` are bypassed. 
+
+In general, there can be any number of balancers, and the user can give the balancers arbitrary names. 
 
 #### At this point, they behave like one single model
 You can fit, predict, cross-validate and finetune it like any other MLJ model. Here is an example for finetuning
