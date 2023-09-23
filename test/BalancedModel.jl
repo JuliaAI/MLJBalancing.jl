@@ -9,8 +9,11 @@
 	y_train, y_test = y[train_inds], y[test_inds]
 
 	# Load models and balancers
-	SVC = @load SVC pkg = LIBSVM
-	LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
+	using LIBSVM
+	SVC = @load SVC
+	using MLJLinearModels
+	LogisticClassifier = @load LogisticClassifier
+	
 	# Here are a probabilistic and a deterministic model
 	model_prob = LogisticClassifier()
 	model_det = SVC(gamma = 0.01)
@@ -24,11 +27,11 @@
 	### 1. Make a pipeline of the three balancers and a probablistic model
 	## ordinary way
 	mach = machine(balancer1)
-	Xover, yover = MLJ.transform(mach, X_train, y_train)
+	Xover, yover = MLJBase.transform(mach, X_train, y_train)
 	mach = machine(balancer2)
-	Xover, yover = MLJ.transform(mach, Xover, yover)
+	Xover, yover = MLJBase.transform(mach, Xover, yover)
 	mach = machine(balancer3)
-	Xover, yover = MLJ.transform(mach, Xover, yover)
+	Xover, yover = MLJBase.transform(mach, Xover, yover)
 
 	mach = machine(model_prob, Xover, yover)
 	fit!(mach)
@@ -56,11 +59,11 @@
 	### 2. Make a pipeline of the three balancers and a deterministic model
 	## ordinary way
 	mach = machine(balancer1)
-	Xover, yover = MLJ.transform(mach, X_train, y_train)
+	Xover, yover = MLJBase.transform(mach, X_train, y_train)
 	mach = machine(balancer2)
-	Xover, yover = MLJ.transform(mach, Xover, yover)
+	Xover, yover = MLJBase.transform(mach, Xover, yover)
 	mach = machine(balancer3)
-	Xover, yover = MLJ.transform(mach, Xover, yover)
+	Xover, yover = MLJBase.transform(mach, Xover, yover)
 
 	mach = machine(model_det, Xover, yover)
 	fit!(mach)

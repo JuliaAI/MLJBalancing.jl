@@ -1,5 +1,11 @@
 # MLJBalancing
-A package with exported learning networks that combine resampling methods from Imbalance.jl and classification models from MLJ
+A package providing composite models wrapping class imbalance algorithms from [Imbalance.jl](https://github.com/JuliaAI/Imbalance.jl).
+
+## ⏬ Instalattion
+```julia
+import Pkg;
+Pkg.add("MLJBalancing")
+```
 
 ## 🚅 Sequential Resampling
 
