@@ -222,6 +222,7 @@ end
 
     ```julia
     using MLJ
+    using Imbalance
 
     # Load base classifier and BalancedBaggingClassifier
     BalancedBaggingClassifier = @load BalancedBaggingClassifier pkg=MLJBalancing
@@ -229,20 +230,23 @@ end
 
     # Construct the base classifier and use it to construct a BalancedBaggingClassifier
     logistic_model = LogisticClassifier()
-    model = BalancedBaggingClassifier(model=logistic_model, T=50)
+    model = BalancedBaggingClassifier(model=logistic_model, T=5)
 
     # Load the data and train the BalancedBaggingClassifier
-    X, y = @load_iris
+    X, y = Imbalance.generate_imbalanced_data(100, 5; cat_feats_num_vals = [3, 2], 
+                                                probs = [0.9, 0.1], 
+                                                type = "ColTable", 
+                                                rng=42)
+    julia> Imbalance.checkbalance(y)
+    1: ▇▇▇▇▇▇▇▇▇▇ 16 (19.0%) 
+    0: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 84 (100.0%) 
+    
     mach = machine(model, X, y) |> fit!
     
     # Predict using the trained model
-    Xnew = (sepal_length = [6.4, 7.2, 7.4],
-            sepal_width = [2.8, 3.0, 2.8],
-            petal_length = [5.6, 5.8, 6.1],
-            petal_width = [2.1, 1.6, 1.9],)
 
-    yhat = predict(mach, Xnew) # probabilistic predictions
-    predict_mode(mach, Xnew)   # point predictions
+    yhat = predict(mach, X)     # probabilistic predictions
+    predict_mode(mach, X)       # point predictions
     ```
 """
 BalancedBaggingClassifier
