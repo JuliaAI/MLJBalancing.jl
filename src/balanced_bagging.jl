@@ -165,12 +165,19 @@ for trait in [
 end
 
 """
-$(MMI.doc_header(BalancedBaggingClassifier))
+    BalancedBaggingClassifier
+    A model type for constructing a balanced bagging classifier, based on [MLJBalancing.jl](https://github.com/JuliaAI/MLJBalancing).
 
-    Given a probablistic classifier.`BalancedBaggingClassifier` performs bagging by only undersampling
-    majority data in each bag so that its includes as much samples as in the minority data.
-    When the classifier is Adaboost, it is tantamount to EasyEnsemble as presented in Xu-Ying Liu, 
-    Jianxin Wu, & Zhi-Hua Zhou. (2009). Exploratory Undersampling for Class-Imbalance Learning. 
+    From MLJ, the type can be imported using
+
+    `BalancedBaggingClassifier = @load BalancedBaggingClassifier pkg=MLJBalancing``
+
+    Construct an instance with default hyper-parameters using the syntax `bagging_model = BalancedBaggingClassifier(model=...)`
+
+    Given a probablistic classifier.`BalancedBaggingClassifier` performs bagging by undersampling
+    only majority data in each bag so that its includes as much samples as in the minority data.
+    This is proposed with an Adaboost classifier where the output scores are averaged in the paper
+    Xu-Ying Liu, Jianxin Wu, & Zhi-Hua Zhou. (2009). Exploratory Undersampling for Class-Imbalance Learning. 
     IEEE Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics), 39 (2), 539–5501 
 
 
