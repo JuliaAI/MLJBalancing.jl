@@ -11,4 +11,4 @@ using CategoricalArrays
 using MLJ
 
 include("utils.jl")
-include("BalancedBagging.jl")
+include("balanced_bagging.jl")

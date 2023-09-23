@@ -10,7 +10,7 @@ using StatsBase: sample
 
 MMI = MLJModelInterface
 
-include("BalancedBagging.jl")
+include("balanced_bagging.jl")
 export BalancedBaggingClassifier
 
 end
