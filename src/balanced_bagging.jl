@@ -92,7 +92,6 @@ end
 
 function MLJBase.prefit(model::BalancedBaggingClassifier, verbosity, X, y)
     rngs = rand(model.rng, 1:model.T*10, model.T)
-    println(rngs)
     Xs, ys = source(X), source(y)
     majority_inds, minority_inds, majority_count, minority_count =
         get_majority_minority_inds_counts(y)
@@ -112,7 +111,6 @@ function MLJBase.prefit(model::BalancedBaggingClassifier, verbosity, X, y)
     machines = (machine(:model, Xsub, ysub) for (Xsub, ysub) in X_y_list_s)
     # Average the predictions from nodes
     all_preds = [MLJBase.predict(mach, Xs) for (mach, (X, _)) in zip(machines, X_y_list_s)]
-    println(all_preds)
     yhat = mean(all_preds)
     return (; predict = yhat)
 end
