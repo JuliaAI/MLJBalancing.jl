@@ -18,8 +18,8 @@
 	model_prob = LogisticClassifier()
 	model_det = SVC(gamma = 0.01)
 	# And here are three resamplers from Imbalance. 
-	# The package should actually work with any transformer that takes and gives (X, y)
-	# Provided that it implemented the MLJ interface. Here, the balancer is the transformer
+	# The package should actually work with any `Static` transformer of the form  `(X, y) -> (Xout, yout)`
+	# provided that it implements the MLJ interface. Here, the balancer is the transformer
 	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = 42)
 	balancer2 = Imbalance.MLJ.SMOTENC(k = 10, ratios = 1.2, rng = 42)
 	balancer3 = Imbalance.MLJ.ROSE(ratios = 1.3, rng = 42)
