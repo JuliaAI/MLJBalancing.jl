@@ -38,11 +38,13 @@ You can fit, predict, cross-validate and finetune it like any other MLJ model. H
 r1 = range(balanced_model, :(balancer1.k), lower=3, upper=10)
 r2 = range(balanced_model, :(balancer2.min_ratios), lower=0.1, upper=0.9)
 
-tuned_balanced_model = TunedModel(model=balanced_model,
-									  tuning=Grid(goal=4),
-									  resampling=CV(nfolds=4),
-									  range=[r1, r2],
-									  measure=cross_entropy);
+tuned_balanced_model = TunedModel(
+    model=balanced_model,
+    tuning=Grid(goal=4),
+    resampling=CV(nfolds=4),
+    range=[r1, r2],
+    measure=cross_entropy
+);
 
 mach = machine(tuned_balanced_model, X, y);
 fit!(mach, verbosity=0);
