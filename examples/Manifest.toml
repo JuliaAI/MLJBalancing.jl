@@ -2,7 +2,7 @@
 
 julia_version = "1.8.5"
 manifest_format = "2.0"
-project_hash = "22186d00eb93f33f8f3d25877339ce9abac3932a"
+project_hash = "bb8a7bcab9f98b02a846587066cc275d77de9db7"
 
 [[deps.ARFFFiles]]
 deps = ["CategoricalArrays", "Dates", "Parsers", "Tables"]
@@ -466,6 +466,12 @@ deps = ["CategoricalArrays", "ComputationalResources", "Distributed", "Distribut
 git-tree-sha1 = "193f1f1ac77d91eabe1ac81ff48646b378270eef"
 uuid = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 version = "0.19.5"
+
+[[deps.MLJBalancing]]
+deps = ["MLJBase", "MLJModelInterface", "OrderedCollections", "Random"]
+path = "/Users/essam/.julia/dev/MLJBalancing"
+uuid = "45f359ea-796d-4f51-95a5-deb1a414c586"
+version = "1.0.0-DEV"
 
 [[deps.MLJBase]]
 deps = ["CategoricalArrays", "CategoricalDistributions", "ComputationalResources", "Dates", "DelimitedFiles", "Distributed", "Distributions", "InteractiveUtils", "InvertedIndices", "LinearAlgebra", "LossFunctions", "MLJModelInterface", "Missings", "OrderedCollections", "Parameters", "PrettyTables", "ProgressMeter", "Random", "ScientificTypes", "Serialization", "StatisticalTraits", "Statistics", "StatsBase", "Tables"]
