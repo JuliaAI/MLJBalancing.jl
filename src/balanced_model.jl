@@ -91,7 +91,6 @@ function BalancedModel(; model=nothing, named_balancers...)
     # warn if balancer is not given
     isempty(balancers) && @warn WRN_BALANCER_UNSPECIFIED
     # call the appropriate constructor
-    println(MMI.abstract_type(model))
     return MODELTYPE_TO_COMPOSITETYPE_EVAL[MMI.abstract_type(model)](balancernames, balancers, model)
 end
 

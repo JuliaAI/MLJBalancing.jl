@@ -1,12 +1,10 @@
 using Test
 using MLJBalancing
+using MLJBase
 using MLJ
 using Imbalance
-import MLJBase
-using MLJModelInterface
-MMI = MLJModelInterface
 using Random
 using DataFrames
 
 
-include("BalancedModel.jl")
+include("balanced_model.jl")

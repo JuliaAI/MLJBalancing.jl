@@ -5,7 +5,7 @@ using MLJModelInterface
 using OrderedCollections
 MMI = MLJModelInterface
 
-include("BalancedModel.jl")
+include("balanced_model.jl")
 export BalancedModel
 
 end

@@ -9,14 +9,12 @@
 	y_train, y_test = y[train_inds], y[test_inds]
 
 	# Load models and balancers
-	using LIBSVM
-	SVC = @load SVC
-	using MLJLinearModels
-	LogisticClassifier = @load LogisticClassifier
+	DeterministicConstantClassifier = @load DeterministicConstantClassifier pkg=MLJModels
+	LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels
 	
 	# Here are a probabilistic and a deterministic model
 	model_prob = LogisticClassifier()
-	model_det = SVC(gamma = 0.01)
+	model_det = DeterministicConstantClassifier()
 	# And here are three resamplers from Imbalance. 
 	# The package should actually work with any `Static` transformer of the form  `(X, y) -> (Xout, yout)`
 	# provided that it implements the MLJ interface. Here, the balancer is the transformer
