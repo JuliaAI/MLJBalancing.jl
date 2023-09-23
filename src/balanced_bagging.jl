@@ -5,7 +5,6 @@ Return a dictionary `result` mapping each unique value in a given abstract vecto
 """
 function group_inds(y::AbstractVector{T}) where {T}
     result = LittleDict{T,AbstractVector{Int}}()
-    freeze(result)
     for (i, v) in enumerate(y)
         # Make a new entry in the dict if it doesn't exist
         if !haskey(result, v)
@@ -14,7 +13,7 @@ function group_inds(y::AbstractVector{T}) where {T}
         # It exists, so push the index belonging to the class
         push!(result[v], i)
     end
-    return result
+    return freeze(result)
 end
 
 const ERR_MULTICLASS_UNSUPP(num_classes) =
