@@ -1,6 +1,6 @@
 #=
 This is how the struct and the constructor for the model balancer
-    if it were to support only the probabilistic model type:
+would look if it were to support only the probabilistic model type:
 
 struct BalancedModel <:ProbabilisticNetworkComposite
     balancer                     # oversampler or undersampler
