@@ -1,7 +1,7 @@
 using Test
 using MLJBalancing
 using MLJBase
-using MLJ
+using MLJModels
 using Imbalance
 using Random
 using DataFrames
