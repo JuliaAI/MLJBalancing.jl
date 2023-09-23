@@ -9,7 +9,7 @@ Pkg.add("MLJBalancing")
 
 ## 🚅 Sequential Resampling
 
-This package allows chaining of resampling methods from Imbalance.jl with classification models from MLJ. Simply construct a `BalancedModel` object while specifying the model and an arbitrart number of resamplers.
+This package allows chaining of resampling methods from Imbalance.jl with classification models from MLJ. Simply construct a `BalancedModel` object while specifying the model (classifier) and an arbitrary number of resamplers (also called *balancers* - typically oversamplers and/or under samplers).
 
 ### 📖 Example
 
