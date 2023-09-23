@@ -29,7 +29,7 @@ end
         minority_inds,
         majority_count,
         minority_count,
-        42,
+        Random.Xoshiro(42)
     )
     X_sub, y_sub = X_sub(rows = 1:100), y_sub(rows = 1:100)
     majority_inds_sub, minority_inds_sub, _, _ =
@@ -52,7 +52,6 @@ end
     ## setup parameters
     R = Random.Xoshiro(42)
     T = 2
-    rngs = rand(R, 1:T*10, T)
     LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
     model = LogisticClassifier()
 
@@ -87,7 +86,7 @@ end
         minority_inds,
         majority_count,
         minority_count,
-        13,
+        R,
     )
     X_sub1, y_sub1 = X_sub1(rows = 1:100), y_sub1(rows = 1:100)
     X_sub2, y_sub2 = MLJBalancing.get_some_balanced_subset(
@@ -97,7 +96,7 @@ end
         minority_inds,
         majority_count,
         minority_count,
-        10,
+        R,
     )
     X_sub2, y_sub2 = X_sub2(rows = 1:100), y_sub2(rows = 1:100)
 
@@ -111,7 +110,7 @@ end
     pred_manual = mean([pred1, pred2])
 
     ## using BalancedBagging
-    modelo = BalancedBaggingClassifier(classifier = model, T = 2, rng = Random.Xoshiro(42))
+    modelo = BalancedBaggingClassifier(model = model, T = 2, rng = Random.Xoshiro(42))
     mach = machine(modelo, X, y)
     fit!(mach)
     pred_auto = MLJBase.predict(mach, Xt)

@@ -1,13 +1,11 @@
 using Test
 using MLJBalancing
 using Imbalance
-import MLJBase
+using MLJBase
+using MLJModels
 using MLJModelInterface
-MMI = MLJModelInterface
 using Random
 using DataFrames
 using Tables
-using CategoricalArrays
-using MLJ
 
 include("balanced_bagging.jl")

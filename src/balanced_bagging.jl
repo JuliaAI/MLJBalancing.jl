@@ -42,10 +42,10 @@ function get_majority_minority_inds_counts(y)
 end
 
 """
-Given data `X`, `y` where `X` is a table and `y` is an abstract vector, the indices and counts
-    of the majority and minority classes and an integer for the seed, return `X_sub`, `y_sum`
-    which are the result of randomly undersampling the majority class data in `X`, `y` so that
-    both classes occur equally frequently.
+Given data `X`, `y` where `X` is a table and `y` is an abstract vector (which may be wrapped in nodes), 
+    the indices and counts of the majority and minority classes and abstract rng,
+    return `X_sub`, `y_sub`, in the form of nodes, which are the result of randomly undersampling 
+    the majority class data in `X`, `y` so that both classes occur equally frequently.
 """
 function get_some_balanced_subset(
     X,
@@ -54,9 +54,8 @@ function get_some_balanced_subset(
     minority_inds,
     majority_count,
     minority_count,
-    rng::Integer,
+    rng::AbstractRNG,
 )
-    rng = Xoshiro(rng)
     # randomly sample a subset of size minority_count indices from those belonging to majority class
     random_inds = sample(rng, 1:majority_count, minority_count, replace = true)
     majority_inds_undersampled = majority_inds[random_inds]
@@ -71,30 +70,40 @@ end
 """
 Construct an BalancedBaggingClassifier model.
 """
-mutable struct BalancedBaggingClassifier{R<:AbstractRNG,I<:Integer,P<:Probabilistic} <:
+mutable struct BalancedBaggingClassifier{RI<:Union{AbstractRNG, Integer},I<:Integer,P<:Probabilistic} <:
                ProbabilisticNetworkComposite
     model::P
     T::I
-    rng::R
+    rng::RI
 end
 
-const ERR_MISSING_CLF = "No classifier specified. Please specify a probabilistic classifier using the `classifier` keyword argument."
-const ERR_MISSING_T = "The number of ensemble models must be specified. Please specify the number of models using the `T` keyword argument."
+rng_handler(rng::Integer) = Random.Xoshiro(rng)
+rng_handler(rng::AbstractRNG) = rng
+const ERR_MISSING_CLF = "No model specified. Please specify a probabilistic classifier using the `model` keyword argument."
+const ERR_BAD_T = "The number of ensemble models `T` cannot be negative."
+const INFO_DEF_T(T_def) = "The number of ensemble models was not given and was thus, automatically set to $T_def"*
+                          " which is the ratio of the frequency of the majority class to that of the minority class"
 function BalancedBaggingClassifier(;
-    classifier = nothing,
-    T = nothing,
+    model = nothing,
+    T = 0,
     rng = Random.default_rng(),
 )
-    classifier === nothing && error(ERR_MISSING_CLF)
-    T === nothing && error(ERR_MISSING_T)           # probably want to do better.
-    return BalancedBaggingClassifier(classifier, T, rng)
+    model === nothing && error(ERR_MISSING_CLF)
+    T < 0 && error(ERR_BAD_T)      
+    rng = rng_handler(rng)    
+    return BalancedBaggingClassifier(model, T, rng)
 end
 
-function MLJBase.prefit(model::BalancedBaggingClassifier, verbosity, X, y)
-    rngs = rand(model.rng, 1:model.T*10, model.T)
+function MLJBase.prefit(composite_model::BalancedBaggingClassifier, verbosity, X, y)
     Xs, ys = source(X), source(y)
     majority_inds, minority_inds, majority_count, minority_count =
         get_majority_minority_inds_counts(y)
+    T = composite_model.T
+    if composite_model.T == 0
+        T_def = round(Int, majority_count/minority_count)
+        T = T_def
+        @info  INFO_DEF_T(T_def)
+    end
     # get as much balanced subsets as needed
     X_y_list_s = [
         get_some_balanced_subset(
@@ -104,16 +113,17 @@ function MLJBase.prefit(model::BalancedBaggingClassifier, verbosity, X, y)
             minority_inds,
             majority_count,
             minority_count,
-            rng,
-        ) for rng in rngs
+            composite_model.rng,
+        ) for i in 1:T
     ]
     # Make a machine for each
     machines = (machine(:model, Xsub, ysub) for (Xsub, ysub) in X_y_list_s)
     # Average the predictions from nodes
     all_preds = [MLJBase.predict(mach, Xs) for (mach, (X, _)) in zip(machines, X_y_list_s)]
     yhat = mean(all_preds)
-    return (; predict = yhat)
+    return (; predict=yhat )
 end
+
 ### To register with MLJ
 MMI.metadata_pkg(
     BalancedBaggingClassifier,
@@ -172,8 +182,8 @@ $(MMI.doc_header(BalancedBaggingClassifier))
     
     where
     
-    - `X`: any table of input features (e.g., a `DataFrame`) so long as elements in each column
-        are subtypes of either the `Finite` or `Infinite` scientific types.
+    - `X`: input features of a form supported by the `model` being wrapped (typically a table, e.g., `DataFrame`,
+        with `Continuous` columns will be supported, as a minimum)
     
     - `y`: the binary target, which can be any `AbstractVector` where `length(unique(y)) == 2`
 
@@ -183,11 +193,13 @@ $(MMI.doc_header(BalancedBaggingClassifier))
 
     # Hyperparameters
 
-    - `classifier<:Probabilistic`: The classifier to use to train on each bag.
+    - `model<:Probabilistic`: The classifier to use to train on each bag.
 
-    - `T::integer`: The number of bags 
+    - `T::integer=0`: The number of bags to be used in the ensemble. If not given, will be set as
+        the ratio between the frequency of the majority and minority classes.
 
-    - `rng::AbstractRNG`: The random number generator to use. 
+    - `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer` 
+    seed to be used with `Xoshiro`
 
     # Operations
 
@@ -195,8 +207,8 @@ $(MMI.doc_header(BalancedBaggingClassifier))
     features `Xnew` having the same scitype as `X` above. Predictions
     are probabilistic, but uncalibrated.
 
-    - `predict_mode(mach, Xnew)`: instead return the mode of each
-    prediction above.
+    - `predict_mode(mach, Xnew)`: return the mode of each prediction above
+
 
 
     # Example
@@ -210,7 +222,7 @@ $(MMI.doc_header(BalancedBaggingClassifier))
 
     # Construct the base classifier and use it to construct a BalancedBaggingClassifier
     logistic_model = LogisticClassifier()
-    model = BalancedBaggingClassifier(classifier=logistic_model, T=50)
+    model = BalancedBaggingClassifier(model=logistic_model, T=50)
 
     # Load the data and train the BalancedBaggingClassifier
     X, y = @load_iris
