@@ -10,5 +10,4 @@ using Tables
 using CategoricalArrays
 using MLJ
 
-include("utils.jl")
 include("balanced_bagging.jl")
