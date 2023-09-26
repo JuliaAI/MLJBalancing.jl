@@ -10,17 +10,16 @@ OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
-julia = "1"
 MLJBase = "0.21"
-MLJModelInterface = "1.9"
 OrderedCollections = "1.6"
+julia = "1.6"
 
 [extras]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Imbalance = "c709b415-507b-45b7-9a3d-1767c89fde68"
-MLJLIBSVMInterface = "61c7150f-6c77-4bb1-949c-13197eac2a52"
 MLJLinearModels = "6ee0df7b-362f-4a72-a706-9e79364fb692"
+MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Imbalance", "DataFrames", "MLJLIBSVMInterface", "MLJLinearModels"]
+test = ["Test", "Imbalance", "DataFrames", "MLJLinearModels", "MLJModels"]
