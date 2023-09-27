@@ -4,10 +4,13 @@ authors = ["Essam <essamwisam@outlook.com> and contributors"]
 version = "1.0.0-DEV"
 
 [deps]
+JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 MLJModelInterface = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
+MLUtils = "f1d291b0-491e-4a28-83b9-f70985020b54"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 MLJBase = "0.21"
@@ -17,9 +20,10 @@ julia = "1.6"
 [extras]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Imbalance = "c709b415-507b-45b7-9a3d-1767c89fde68"
-MLJLinearModels = "6ee0df7b-362f-4a72-a706-9e79364fb692"
 MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
+MLJLinearModels = "6ee0df7b-362f-4a72-a706-9e79364fb692"
+Tables = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "Imbalance", "DataFrames", "MLJLinearModels", "MLJModels"]
+test = ["Test", "Imbalance", "DataFrames", "MLJLinearModels", "MLJModels", "Tables"]
