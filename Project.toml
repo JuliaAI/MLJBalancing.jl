@@ -11,6 +11,7 @@ Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
 MLJBase = "0.21"
+MLJModelInterface = "1"
 OrderedCollections = "1.6"
 julia = "1.6"
 
