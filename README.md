@@ -1,5 +1,5 @@
 # MLJBalancing
-A package providing composite models wrapping class imbalance algorithms from [Imbalance.jl](https://github.com/JuliaAI/Imbalance.jl).
+A package providing composite models wrapping class imbalance algorithms from [Imbalance.jl](https://github.com/JuliaAI/Imbalance.jl) with classifiers from [MLJ](https://github.com/alan-turing-institute/MLJ.jl). 
 
 ## ⏬ Instalattion
 ```julia
@@ -51,6 +51,24 @@ fit!(mach, verbosity=0);
 fitted_params(mach).best_model
 ```
 
-## 🚆🚆 Parallel Resampling with EasyEnsemble
+## 🚆🚆 Parallel Resampling with Balanced Bagging
 
-Coming soon...
+The package also offers an implementation of bagging over probabilistic classifiers where the majority class is repeatedly undersampled `T` times down to the size of the minority class. This undersampling scheme was proposed in the *EasyEnsemble* algorithm found in the paper *Exploratory Undersampling for Class-Imbalance Learning.* by *Xu-Ying Liu, Jianxin Wu, & Zhi-Hua Zhou* where an Adaboost model was used and the output scores were averaged.
+
+
+#### Construct a BalancedBaggingClassifier
+In this you must specify the model, and optionally specify the number of bags `T` and the random number generator `rng`. If `T` is not specified it is set as the ratio between the majority and minority counts. If `rng` isn't specified then `default_rng()` is used.
+
+```julia
+LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels verbosity=0
+logistic_model = LogisticClassifier()
+bagging_model = BalancedBaggingClassifier(model=logistic_model, T=10, rng=Random.Xoshiro(42))
+```
+
+#### Now it behaves like one single model
+You can fit, predict, cross-validate and finetune it like any other probabilistic MLJ model where `X` must be a table input (e.g., a dataframe).
+```julia
+mach = machine(bagging_model, X, y)
+fit!(mach)
+pred = predict(mach, X)
+```

@@ -1,9 +1,0 @@
-[deps]
-Imbalance = "c709b415-507b-45b7-9a3d-1767c89fde68"
-MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
-MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
-MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
-MLJLinearModels = "6ee0df7b-362f-4a72-a706-9e79364fb692"
-MLJBalancing = "45f359ea-796d-4f51-95a5-deb1a414c586"
-DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
-Imbalance = "c709b415-507b-45b7-9a3d-1767c89fde68"

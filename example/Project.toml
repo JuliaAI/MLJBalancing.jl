@@ -1,0 +1,5 @@
+[deps]
+Imbalance = "c709b415-507b-45b7-9a3d-1767c89fde68"
+MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
+MLJBalancing = "45f359ea-796d-4f51-95a5-deb1a414c586"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
