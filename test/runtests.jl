@@ -1,11 +1,11 @@
 using Test
 using MLJBalancing
-using Imbalance
 using MLJBase
 using MLJModels
-using MLJModelInterface
+using Imbalance
 using Random
 using DataFrames
 using Tables
 
 include("balanced_bagging.jl")
+include("balanced_model.jl")

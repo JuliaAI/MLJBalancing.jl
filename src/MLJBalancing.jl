@@ -12,5 +12,7 @@ MMI = MLJModelInterface
 
 include("balanced_bagging.jl")
 export BalancedBaggingClassifier
+include("balanced_model.jl")
+export BalancedModel
 
 end
