@@ -57,7 +57,7 @@ The package also offers an implementation of bagging over probabilistic classifi
 
 
 #### Construct a BalancedBaggingClassifier
-In this you must specify the model, and optionally specify the number of bags `T` and the random number generator `rng`. If `T` is not specified it is set as the ratio between the majority and minority counts. If `rng` isn't specified then `default_rng()` is used.
+In this you must specify some probabilistic model, and optionally specify the number of bags `T` and the random number generator `rng`. If `T` is not specified it is set as the ratio between the majority and minority counts. If `rng` isn't specified then `default_rng()` is used.
 
 ```julia
 LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels verbosity=0
