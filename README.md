@@ -1,7 +1,7 @@
 # MLJBalancing
 A package providing composite models wrapping class imbalance algorithms from [Imbalance.jl](https://github.com/JuliaAI/Imbalance.jl) with classifiers from [MLJ](https://github.com/alan-turing-institute/MLJ.jl). 
 
-## ⏬ Instalattion
+## ⏬ Instalation
 ```julia
 import Pkg;
 Pkg.add("MLJBalancing")
@@ -17,6 +17,7 @@ This package allows chaining of resampling methods from Imbalance.jl with classi
 ```julia
 SMOTENC = @load SMOTENC pkg=Imbalance verbosity=0
 TomekUndersampler = @load TomekUndersampler pkg=Imbalance verbosity=0
+LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels verbosity=0
 
 oversampler = SMOTENC(k=5, ratios=1.0, rng=42)
 undersampler = TomekUndersampler(min_ratios=0.5, rng=42)
