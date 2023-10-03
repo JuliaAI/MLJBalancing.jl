@@ -1,7 +1,7 @@
 # MLJBalancing
 A package providing composite models wrapping class imbalance algorithms from [Imbalance.jl](https://github.com/JuliaAI/Imbalance.jl) with classifiers from [MLJ](https://github.com/alan-turing-institute/MLJ.jl). 
 
-## ⏬ Instalattion
+## ⏬ Installation
 ```julia
 import Pkg;
 Pkg.add("MLJBalancing")
