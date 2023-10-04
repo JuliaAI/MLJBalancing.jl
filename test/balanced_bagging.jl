@@ -115,4 +115,9 @@ end
     fit!(mach)
     pred_auto = MLJBase.predict(mach, Xt)
     @test sum(pred_manual) ≈ sum(pred_auto)
+    modelo = BalancedBaggingClassifier(model = model, rng = Random.Xoshiro(42))
+    mach = machine(modelo, X, y)
+    fit!(mach)
+    @test report(mach) == (chosen_T = 5,)
+
 end

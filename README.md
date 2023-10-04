@@ -34,7 +34,7 @@ Here training data will be passed to `balancer1` then `balancer2`, whose output 
 In general, there can be any number of balancers, and the user can give the balancers arbitrary names. 
 
 #### At this point, they behave like one single model
-You can fit, predict, cross-validate and finetune it like any other MLJ model. Here is an example for finetuning
+You can fit, predict, cross-validate and fine-tune it like any other MLJ model. Here is an example for fine-tuning
 ```julia
 r1 = range(balanced_model, :(balancer1.k), lower=3, upper=10)
 r2 = range(balanced_model, :(balancer2.min_ratios), lower=0.1, upper=0.9)
@@ -67,7 +67,7 @@ bagging_model = BalancedBaggingClassifier(model=logistic_model, T=10, rng=Random
 ```
 
 #### Now it behaves like one single model
-You can fit, predict, cross-validate and finetune it like any other probabilistic MLJ model where `X` must be a table input (e.g., a dataframe).
+You can fit, predict, cross-validate and fine-tune it like any other probabilistic MLJ model where `X` must be a table input (e.g., a dataframe).
 ```julia
 mach = machine(bagging_model, X, y)
 fit!(mach)
