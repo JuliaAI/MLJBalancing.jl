@@ -1,7 +1,7 @@
 @testset "BalancedModel" begin
 	### end-to-end test
 	# Create and split data
-	X, y = generate_imbalanced_data(100, 5; probs = [0.2, 0.3, 0.5])
+	X, y = generate_imbalanced_data(100, 5; class_probs = [0.2, 0.3, 0.5])
 	X = DataFrame(X)
 	train_inds, test_inds =
 		partition(eachindex(y), 0.8, shuffle = true, stratify = y, rng = Random.Xoshiro(42))
