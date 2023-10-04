@@ -1,7 +1,7 @@
 name = "MLJBalancing"
 uuid = "45f359ea-796d-4f51-95a5-deb1a414c586"
 authors = ["Essam Wisam <essamwisam@outlook.com>", "Anthony Blaom <anthony.blaom@gmail.com> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 MLJBase = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
