@@ -234,8 +234,8 @@ logistic_model = LogisticClassifier()
 model = BalancedBaggingClassifier(model=logistic_model, T=5)
 
 # Load the data and train the BalancedBaggingClassifier
-X, y = Imbalance.generate_imbalanced_data(100, 5; cat_feats_num_vals = [3, 2], 
-                                            probs = [0.9, 0.1], 
+X, y = Imbalance.generate_imbalanced_data(100, 5; num_vals_per_category = [3, 2], 
+                                            class_probs = [0.9, 0.1], 
                                             type = "ColTable", 
                                             rng=42)
 julia> Imbalance.checkbalance(y)
