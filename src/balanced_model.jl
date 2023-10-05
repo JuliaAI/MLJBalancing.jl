@@ -116,7 +116,7 @@ for model_type in SUPPORTED_MODEL_TYPES
     eval(ex)
 end
 
-const ERR_NO_PROP = "trying to access property $name which does not exist"
+const ERR_NO_PROP = ErrorException("trying to access property $name which does not exist")
 # overload set property to set the property from the vector in the struct
 for model_type in SUPPORTED_MODEL_TYPES
     struct_name = MODELTYPE_TO_COMPOSITETYPE[model_type]
@@ -128,7 +128,7 @@ for model_type in SUPPORTED_MODEL_TYPES
             !isnothing(idx) && return getfield(b, :balancers)[idx] = val
             # the other only option is model
             name === :model && return setfield(b, :model, val)
-            error(ERR_NO_PROP)
+            throw(ERR_NO_PROP)
         end
     end
     eval(ex)
