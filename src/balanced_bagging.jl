@@ -27,7 +27,7 @@ function get_majority_minority_inds_counts(y)
     # a tuple mapping each class to its indices
     labels_inds = collect(group_inds(y))
     num_classes = length(labels_inds)
-    num_classes == 2 || throw(ArgumentError(ERR_MULTICLASS_UNSUPP(num_classes)))
+    num_classes == 2 || throw(ErrorException(ERR_MULTICLASS_UNSUPP(num_classes)))
     # get the length of each class
     first_class_count = length(labels_inds[1][2])
     second_class_count = length(labels_inds[2][2])

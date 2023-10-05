@@ -1,11 +1,11 @@
 
 @testset "group_inds and get_majority_minority_inds_counts" begin
     y = [0, 0, 0, 0, 1, 1, 1, 0]
-    @test MLJBalancing.group_inds(y) == Dict(0 => [1, 2, 3, 4, 8], 1 => [5, 6, 7])
+    @test MLJBalancing.group_inds(y) == Dict(0 => [1, 2, 3, 4, 8], 1 => [5, 6,  7])
     @test MLJBalancing.get_majority_minority_inds_counts(y) ==
           ([1, 2, 3, 4, 8], [5, 6, 7], 5, 3)
     y = [0, 0, 0, 0, 1, 1, 1, 0, 2, 2, 2]
-    @test_throws MLJBalancing.ERR_MULTICLASS_UNSUPP(3) MLJBalancing.get_majority_minority_inds_counts(
+    @test_throws ErrorException(MLJBalancing.ERR_MULTICLASS_UNSUPP(3)) MLJBalancing.get_majority_minority_inds_counts(
         y,
     )
 end

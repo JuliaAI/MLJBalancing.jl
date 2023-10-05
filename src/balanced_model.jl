@@ -55,13 +55,13 @@ const UNION_MODEL_TYPES = Union{keys(MODELTYPE_TO_COMPOSITETYPE_EVAL)...}
 
 
 # Possible Errors (for the constructor as well)
-const ERR_MODEL_UNSPECIFIED = ArgumentError("Expected an atomic model as argument. None specified. ")
+const ERR_MODEL_UNSPECIFIED = ErrorException("Expected an atomic model as argument. None specified. ")
 
 const WRN_BALANCER_UNSPECIFIED = "No balancer was provided. Data will be directly passed to the model. "
 
 const PRETTY_SUPPORTED_MODEL_TYPES = join([string("`", opt, "`") for opt in SUPPORTED_MODEL_TYPES], ", ",", and ")
 
-const ERR_UNSUPPORTED_MODEL(model) = ArgumentError(
+const ERR_UNSUPPORTED_MODEL(model) = ErrorException(
     "Only these model supertypes support wrapping: "*
     "$PRETTY_SUPPORTED_MODEL_TYPES.\n"*
     "Model provided has type `$(typeof(model))`. "
