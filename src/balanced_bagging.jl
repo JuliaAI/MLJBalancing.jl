@@ -1,4 +1,3 @@
-
 """
 Return a dictionary `result` mapping each unique value in a given abstract vector `y`
     to the vector of indices where that value occurs.
@@ -16,18 +15,21 @@ function group_inds(y::AbstractVector{T}) where {T}
     return freeze(result)
 end
 
-const ERR_MULTICLASS_UNSUPP(num_classes) =
-    "Only binary classification supported by BalancedBaggingClassifier. Got $num_classes classes"
+const ERR_MULTICLASS_UNSUPP(num_classes) = ArgumentError(
+"Only binary classification supported by BalancedBaggingClassifier. "*
+    "Got $num_classes classes"
+)
 
 """
-Given an abstract vector `y` where any element takes one of two values, return the indices of the
-    most frequent of them, the indices of the least frequent of them, and the counts of each.
+Given an abstract vector `y` where any element takes one of two values, return the
+indices of the most frequent of them, the indices of the least frequent of them, and the
+counts of each.
 """
 function get_majority_minority_inds_counts(y)
     # a tuple mapping each class to its indices
     labels_inds = collect(group_inds(y))
     num_classes = length(labels_inds)
-    num_classes == 2 || throw(ArgumentError(ERR_MULTICLASS_UNSUPP(num_classes)))
+    num_classes == 2 || throw(ERR_MULTICLASS_UNSUPP(num_classes))
     # get the length of each class
     first_class_count = length(labels_inds[1][2])
     second_class_count = length(labels_inds[2][2])
@@ -42,9 +44,9 @@ function get_majority_minority_inds_counts(y)
 end
 
 """
-Given data `X`, `y` where `X` is a table and `y` is an abstract vector (which may be wrapped in nodes), 
+Given data `X`, `y` where `X` is a table and `y` is an abstract vector (which may be wrapped in nodes),
     the indices and counts of the majority and minority classes and abstract rng,
-    return `X_sub`, `y_sub`, in the form of nodes, which are the result of randomly undersampling 
+    return `X_sub`, `y_sub`, in the form of nodes, which are the result of randomly undersampling
     the majority class data in `X`, `y` so that both classes occur equally frequently.
 """
 function get_some_balanced_subset(
@@ -89,8 +91,8 @@ function BalancedBaggingClassifier(;
     rng = Random.default_rng(),
 )
     model === nothing && error(ERR_MISSING_CLF)
-    T < 0 && error(ERR_BAD_T)      
-    rng = rng_handler(rng)    
+    T < 0 && error(ERR_BAD_T)
+    rng = rng_handler(rng)
     return BalancedBaggingClassifier(model, T, rng)
 end
 
@@ -178,8 +180,8 @@ Construct an instance with default hyper-parameters using the syntax `bagging_mo
 Given a probablistic classifier.`BalancedBaggingClassifier` performs bagging by undersampling
 only majority data in each bag so that its includes as much samples as in the minority data.
 This is proposed with an Adaboost classifier where the output scores are averaged in the paper
-Xu-Ying Liu, Jianxin Wu, & Zhi-Hua Zhou. (2009). Exploratory Undersampling for Class-Imbalance Learning. 
-IEEE Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics), 39 (2), 539–5501 
+Xu-Ying Liu, Jianxin Wu, & Zhi-Hua Zhou. (2009). Exploratory Undersampling for Class-Imbalance Learning.
+IEEE Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics), 39 (2), 539–5501
 
 
 # Training data
@@ -206,7 +208,7 @@ Train the machine with `fit!(mach, rows=...)`.
 - `T::Integer=0`: The number of bags to be used in the ensemble. If not given, will be set as
     the ratio between the frequency of the majority and minority classes. Can be later found in `report(mach)`.
 
-- `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer` 
+- `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer`
 seed to be used with `Xoshiro`
 
 # Operations
@@ -234,13 +236,13 @@ logistic_model = LogisticClassifier()
 model = BalancedBaggingClassifier(model=logistic_model, T=5)
 
 # Load the data and train the BalancedBaggingClassifier
-X, y = Imbalance.generate_imbalanced_data(100, 5; num_vals_per_category = [3, 2], 
-                                            class_probs = [0.9, 0.1], 
-                                            type = "ColTable", 
+X, y = Imbalance.generate_imbalanced_data(100, 5; num_vals_per_category = [3, 2],
+                                            class_probs = [0.9, 0.1],
+                                            type = "ColTable",
                                             rng=42)
 julia> Imbalance.checkbalance(y)
-1: ▇▇▇▇▇▇▇▇▇▇ 16 (19.0%) 
-0: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 84 (100.0%) 
+1: ▇▇▇▇▇▇▇▇▇▇ 16 (19.0%)
+0: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 84 (100.0%)
 
 mach = machine(model, X, y) |> fit!
 
