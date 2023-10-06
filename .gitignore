@@ -1,3 +1,4 @@
 /Manifest.toml
 .CondaPkg/*
 .CondaPkg
+.vscode/settings.json

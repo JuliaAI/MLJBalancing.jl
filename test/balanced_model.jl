@@ -1,7 +1,7 @@
 @testset "BalancedModel" begin
 	### end-to-end test
 	# Create and split data
-	X, y = generate_imbalanced_data(100, 5; probs = [0.2, 0.3, 0.5])
+	X, y = generate_imbalanced_data(100, 5; class_probs = [0.2, 0.3, 0.5])
 	X = DataFrame(X)
 	train_inds, test_inds =
 		partition(eachindex(y), 0.8, shuffle = true, stratify = y, rng = Random.Xoshiro(42))
@@ -39,9 +39,10 @@
 	@test_throws MLJBalancing.ERR_MODEL_UNSPECIFIED begin
 		BalancedModel(b1 = balancer1, b2 = balancer2, b3 = balancer3)
 	end
-	@test_throws "ArgumentError: Only these model supertypes support wrapping: `Probabilistic`, `Deterministic`, and `Interval`.\nModel provided has type `Int64`." begin
-		BalancedModel(model = 1, b1 = balancer1, b2 = balancer2, b3 = balancer3)
-	end
+    @test_throws(
+        MLJBalancing.ERR_UNSUPPORTED_MODEL(1),
+        BalancedModel(model = 1, b1 = balancer1, b2 = balancer2, b3 = balancer3),
+    )
 	@test_logs (:warn, MLJBalancing.WRN_BALANCER_UNSPECIFIED) begin
 		BalancedModel(model = model_prob)
 	end
@@ -80,7 +81,8 @@
 	Base.getproperty(balanced_model, :b1) == balancer1
 	Base.setproperty!(balanced_model, :b1, balancer2)
 	Base.getproperty(balanced_model, :b1) == balancer2
-	@test_throws MLJBalancing.ERR_NO_PROP begin
-		Base.setproperty!(balanced_model, :name11, balancer2)
-	end
+    @test_throws(
+        MLJBalancing.ERR_NO_PROP,
+	Base.setproperty!(balanced_model, :name11, balancer2),
+    )
 end

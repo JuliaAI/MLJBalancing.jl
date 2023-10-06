@@ -1,4 +1,3 @@
-
 """
 Return a dictionary `result` mapping each unique value in a given abstract vector `y`
     to the vector of indices where that value occurs.
@@ -16,18 +15,21 @@ function group_inds(y::AbstractVector{T}) where {T}
     return freeze(result)
 end
 
-const ERR_MULTICLASS_UNSUPP(num_classes) =
-    "Only binary classification supported by BalancedBaggingClassifier. Got $num_classes classes"
+const ERR_MULTICLASS_UNSUPP(num_classes) = ArgumentError(
+"Only binary classification supported by BalancedBaggingClassifier. "*
+    "Got $num_classes classes"
+)
 
 """
-Given an abstract vector `y` where any element takes one of two values, return the indices of the
-    most frequent of them, the indices of the least frequent of them, and the counts of each.
+Given an abstract vector `y` where any element takes one of two values, return the
+indices of the most frequent of them, the indices of the least frequent of them, and the
+counts of each.
 """
 function get_majority_minority_inds_counts(y)
     # a tuple mapping each class to its indices
     labels_inds = collect(group_inds(y))
     num_classes = length(labels_inds)
-    num_classes == 2 || throw(ArgumentError(ERR_MULTICLASS_UNSUPP(num_classes)))
+    num_classes == 2 || throw(ERR_MULTICLASS_UNSUPP(num_classes))
     # get the length of each class
     first_class_count = length(labels_inds[1][2])
     second_class_count = length(labels_inds[2][2])
@@ -42,9 +44,9 @@ function get_majority_minority_inds_counts(y)
 end
 
 """
-Given data `X`, `y` where `X` is a table and `y` is an abstract vector (which may be wrapped in nodes), 
+Given data `X`, `y` where `X` is a table and `y` is an abstract vector (which may be wrapped in nodes),
     the indices and counts of the majority and minority classes and abstract rng,
-    return `X_sub`, `y_sub`, in the form of nodes, which are the result of randomly undersampling 
+    return `X_sub`, `y_sub`, in the form of nodes, which are the result of randomly undersampling
     the majority class data in `X`, `y` so that both classes occur equally frequently.
 """
 function get_some_balanced_subset(
@@ -89,8 +91,8 @@ function BalancedBaggingClassifier(;
     rng = Random.default_rng(),
 )
     model === nothing && error(ERR_MISSING_CLF)
-    T < 0 && error(ERR_BAD_T)      
-    rng = rng_handler(rng)    
+    T < 0 && error(ERR_BAD_T)
+    rng = rng_handler(rng)
     return BalancedBaggingClassifier(model, T, rng)
 end
 
@@ -102,7 +104,7 @@ function MLJBase.prefit(composite_model::BalancedBaggingClassifier, verbosity, X
     if composite_model.T == 0
         T_def = round(Int, majority_count/minority_count)
         T = T_def
-        @info  INFO_DEF_T(T_def)
+        verbosity>0 && @info  INFO_DEF_T(T_def)
     end
     # get as much balanced subsets as needed
     X_y_list_s = [
@@ -121,7 +123,7 @@ function MLJBase.prefit(composite_model::BalancedBaggingClassifier, verbosity, X
     # Average the predictions from nodes
     all_preds = [MLJBase.predict(mach, Xs) for (mach, (X, _)) in zip(machines, X_y_list_s)]
     yhat = mean(all_preds)
-    return (; predict=yhat )
+    return (; predict=yhat, report=(;chosen_T=node(()->T)))
 end
 
 ### To register with MLJ
@@ -165,88 +167,89 @@ for trait in [
 end
 
 """
+
     BalancedBaggingClassifier
-    A model type for constructing a balanced bagging classifier, based on [MLJBalancing.jl](https://github.com/JuliaAI/MLJBalancing).
+A model type for constructing a balanced bagging classifier, based on [MLJBalancing.jl](https://github.com/JuliaAI/MLJBalancing).
 
-    From MLJ, the type can be imported using
+From MLJ, the type can be imported using
 
-    `BalancedBaggingClassifier = @load BalancedBaggingClassifier pkg=MLJBalancing``
+`BalancedBaggingClassifier = @load BalancedBaggingClassifier pkg=MLJBalancing`
 
-    Construct an instance with default hyper-parameters using the syntax `bagging_model = BalancedBaggingClassifier(model=...)`
+Construct an instance with default hyper-parameters using the syntax `bagging_model = BalancedBaggingClassifier(model=...)`
 
-    Given a probablistic classifier.`BalancedBaggingClassifier` performs bagging by undersampling
-    only majority data in each bag so that its includes as much samples as in the minority data.
-    This is proposed with an Adaboost classifier where the output scores are averaged in the paper
-    Xu-Ying Liu, Jianxin Wu, & Zhi-Hua Zhou. (2009). Exploratory Undersampling for Class-Imbalance Learning. 
-    IEEE Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics), 39 (2), 539–5501 
-
-
-    # Training data
-
-    In MLJ or MLJBase, bind an instance `model` to data with
-    
-        mach = machine(model, X, y)
-    
-    where
-    
-    - `X`: input features of a form supported by the `model` being wrapped (typically a table, e.g., `DataFrame`,
-        with `Continuous` columns will be supported, as a minimum)
-    
-    - `y`: the binary target, which can be any `AbstractVector` where `length(unique(y)) == 2`
+Given a probablistic classifier.`BalancedBaggingClassifier` performs bagging by undersampling
+only majority data in each bag so that its includes as much samples as in the minority data.
+This is proposed with an Adaboost classifier where the output scores are averaged in the paper
+Xu-Ying Liu, Jianxin Wu, & Zhi-Hua Zhou. (2009). Exploratory Undersampling for Class-Imbalance Learning.
+IEEE Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics), 39 (2), 539–5501
 
 
-    Train the machine with `fit!(mach, rows=...)`.
+# Training data
+
+In MLJ or MLJBase, bind an instance `model` to data with
+
+    mach = machine(model, X, y)
+
+where
+
+- `X`: input features of a form supported by the `model` being wrapped (typically a table, e.g., `DataFrame`,
+    with `Continuous` columns will be supported, as a minimum)
+
+- `y`: the binary target, which can be any `AbstractVector` where `length(unique(y)) == 2`
 
 
-    # Hyperparameters
-
-    - `model<:Probabilistic`: The classifier to use to train on each bag.
-
-    - `T::integer=0`: The number of bags to be used in the ensemble. If not given, will be set as
-        the ratio between the frequency of the majority and minority classes.
-
-    - `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer` 
-    seed to be used with `Xoshiro`
-
-    # Operations
-
-    - `predict(mach, Xnew)`: return predictions of the target given
-    features `Xnew` having the same scitype as `X` above. Predictions
-    are probabilistic, but uncalibrated.
-
-    - `predict_mode(mach, Xnew)`: return the mode of each prediction above
+Train the machine with `fit!(mach, rows=...)`.
 
 
+# Hyperparameters
 
-    # Example
+- `model::Probabilistic`: The classifier to use to train on each bag.
 
-    ```julia
-    using MLJ
-    using Imbalance
+- `T::Integer=0`: The number of bags to be used in the ensemble. If not given, will be set as
+    the ratio between the frequency of the majority and minority classes. Can be later found in `report(mach)`.
 
-    # Load base classifier and BalancedBaggingClassifier
-    BalancedBaggingClassifier = @load BalancedBaggingClassifier pkg=MLJBalancing
-    LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels verbosity=0
+- `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer`
+seed to be used with `Xoshiro`
 
-    # Construct the base classifier and use it to construct a BalancedBaggingClassifier
-    logistic_model = LogisticClassifier()
-    model = BalancedBaggingClassifier(model=logistic_model, T=5)
+# Operations
 
-    # Load the data and train the BalancedBaggingClassifier
-    X, y = Imbalance.generate_imbalanced_data(100, 5; cat_feats_num_vals = [3, 2], 
-                                                probs = [0.9, 0.1], 
-                                                type = "ColTable", 
-                                                rng=42)
-    julia> Imbalance.checkbalance(y)
-    1: ▇▇▇▇▇▇▇▇▇▇ 16 (19.0%) 
-    0: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 84 (100.0%) 
-    
-    mach = machine(model, X, y) |> fit!
-    
-    # Predict using the trained model
+- `predict(mach, Xnew)`: return predictions of the target given
+features `Xnew` having the same scitype as `X` above. Predictions
+are probabilistic, but uncalibrated.
 
-    yhat = predict(mach, X)     # probabilistic predictions
-    predict_mode(mach, X)       # point predictions
-    ```
+- `predict_mode(mach, Xnew)`: return the mode of each prediction above
+
+
+
+# Example
+
+```julia
+using MLJ
+using Imbalance
+
+# Load base classifier and BalancedBaggingClassifier
+BalancedBaggingClassifier = @load BalancedBaggingClassifier pkg=MLJBalancing
+LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels verbosity=0
+
+# Construct the base classifier and use it to construct a BalancedBaggingClassifier
+logistic_model = LogisticClassifier()
+model = BalancedBaggingClassifier(model=logistic_model, T=5)
+
+# Load the data and train the BalancedBaggingClassifier
+X, y = Imbalance.generate_imbalanced_data(100, 5; num_vals_per_category = [3, 2],
+                                            class_probs = [0.9, 0.1],
+                                            type = "ColTable",
+                                            rng=42)
+julia> Imbalance.checkbalance(y)
+1: ▇▇▇▇▇▇▇▇▇▇ 16 (19.0%)
+0: ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 84 (100.0%)
+
+mach = machine(model, X, y) |> fit!
+
+# Predict using the trained model
+
+yhat = predict(mach, X)     # probabilistic predictions
+predict_mode(mach, X)       # point predictions
+```
 """
 BalancedBaggingClassifier

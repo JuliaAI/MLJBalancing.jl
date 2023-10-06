@@ -1,7 +1,7 @@
 # MLJBalancing
 A package providing composite models wrapping class imbalance algorithms from [Imbalance.jl](https://github.com/JuliaAI/Imbalance.jl) with classifiers from [MLJ](https://github.com/alan-turing-institute/MLJ.jl). 
 
-## ⏬ Instalattion
+## ⏬ Installation
 ```julia
 import Pkg;
 Pkg.add("MLJBalancing")
@@ -17,6 +17,7 @@ This package allows chaining of resampling methods from Imbalance.jl with classi
 ```julia
 SMOTENC = @load SMOTENC pkg=Imbalance verbosity=0
 TomekUndersampler = @load TomekUndersampler pkg=Imbalance verbosity=0
+LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels verbosity=0
 
 oversampler = SMOTENC(k=5, ratios=1.0, rng=42)
 undersampler = TomekUndersampler(min_ratios=0.5, rng=42)
@@ -33,7 +34,7 @@ Here training data will be passed to `balancer1` then `balancer2`, whose output 
 In general, there can be any number of balancers, and the user can give the balancers arbitrary names. 
 
 #### At this point, they behave like one single model
-You can fit, predict, cross-validate and finetune it like any other MLJ model. Here is an example for finetuning
+You can fit, predict, cross-validate and fine-tune it like any other MLJ model. Here is an example for fine-tuning
 ```julia
 r1 = range(balanced_model, :(balancer1.k), lower=3, upper=10)
 r2 = range(balanced_model, :(balancer2.min_ratios), lower=0.1, upper=0.9)
@@ -57,7 +58,7 @@ The package also offers an implementation of bagging over probabilistic classifi
 
 
 #### Construct a BalancedBaggingClassifier
-In this you must specify the model, and optionally specify the number of bags `T` and the random number generator `rng`. If `T` is not specified it is set as the ratio between the majority and minority counts. If `rng` isn't specified then `default_rng()` is used.
+In this you must specify some probabilistic model, and optionally specify the number of bags `T` and the random number generator `rng`. If `T` is not specified it is set as the ratio between the majority and minority counts. If `rng` isn't specified then `default_rng()` is used.
 
 ```julia
 LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels verbosity=0
@@ -66,7 +67,7 @@ bagging_model = BalancedBaggingClassifier(model=logistic_model, T=10, rng=Random
 ```
 
 #### Now it behaves like one single model
-You can fit, predict, cross-validate and finetune it like any other probabilistic MLJ model where `X` must be a table input (e.g., a dataframe).
+You can fit, predict, cross-validate and fine-tune it like any other probabilistic MLJ model where `X` must be a table input (e.g., a dataframe).
 ```julia
 mach = machine(bagging_model, X, y)
 fit!(mach)

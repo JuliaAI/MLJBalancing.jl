@@ -5,8 +5,9 @@
     @test MLJBalancing.get_majority_minority_inds_counts(y) ==
           ([1, 2, 3, 4, 8], [5, 6, 7], 5, 3)
     y = [0, 0, 0, 0, 1, 1, 1, 0, 2, 2, 2]
-    @test_throws MLJBalancing.ERR_MULTICLASS_UNSUPP(3) MLJBalancing.get_majority_minority_inds_counts(
-        y,
+    @test_throws(
+        MLJBalancing.ERR_MULTICLASS_UNSUPP(3),
+        MLJBalancing.get_majority_minority_inds_counts(y),
     )
 end
 
@@ -14,8 +15,8 @@ end
     X, y = generate_imbalanced_data(
         100,
         5;
-        cat_feats_num_vals = [3, 2, 1, 2],
-        probs = [0.9, 0.1],
+        num_vals_per_category = [3, 2, 1, 2],
+        class_probs = [0.9, 0.1],
         type = "ColTable",
         rng = 42,
     )
@@ -60,8 +61,8 @@ end
     X, y = generate_imbalanced_data(
         100,
         5;
-        cat_feats_num_vals = [3, 2, 1, 2],
-        probs = [0.9, 0.1],
+        num_vals_per_category = [3, 2, 1, 2],
+        class_probs = [0.9, 0.1],
         type = "ColTable",
         rng = 42,
     )
@@ -69,8 +70,8 @@ end
     Xt, yt = generate_imbalanced_data(
         5,
         5;
-        cat_feats_num_vals = [3, 2, 1, 2],
-        probs = [0.9, 0.1],
+        num_vals_per_category = [3, 2, 1, 2],
+        class_probs = [0.9, 0.1],
         type = "ColTable",
         rng = 42,
     )
@@ -115,4 +116,9 @@ end
     fit!(mach)
     pred_auto = MLJBase.predict(mach, Xt)
     @test sum(pred_manual) ≈ sum(pred_auto)
+    modelo = BalancedBaggingClassifier(model = model, rng = Random.Xoshiro(42))
+    mach = machine(modelo, X, y)
+    fit!(mach)
+    @test report(mach) == (chosen_T = 5,)
+
 end
