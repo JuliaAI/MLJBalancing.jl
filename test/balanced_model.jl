@@ -35,8 +35,8 @@
 	fit!(mach)
 	y_pred = MLJBase.predict(mach, X_test)
 
-	# with MLJ balancing
-	@test_throws MLJBalancing.ERR_MODEL_UNSPECIFIED begin
+	# with MLJ balancing 
+	@test_throws  MLJBalancing.ERR_MODEL_UNSPECIFIED begin
 		BalancedModel(b1 = balancer1, b2 = balancer2, b3 = balancer3)
 	end
     @test_throws(
@@ -46,7 +46,6 @@
 	@test_logs (:warn, MLJBalancing.WRN_BALANCER_UNSPECIFIED) begin
 		BalancedModel(model = model_prob)
 	end
-
 	balanced_model =
 		BalancedModel(model = model_prob, b1 = balancer1, b2 = balancer2, b3 = balancer3)
 	mach = machine(balanced_model, X_train, y_train)
@@ -85,4 +84,19 @@
         MLJBalancing.ERR_NO_PROP,
 	Base.setproperty!(balanced_model, :name11, balancer2),
     )
+end
+
+
+@testset "Equivalence of Constructions" begin
+    ## setup parameters
+    R = Random.Xoshiro(42)
+    LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
+	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = 42)
+    model = LogisticClassifier()
+    BalancedModel(model=model, balancer1=balancer1) == BalancedModel(model; balancer1=balancer1)
+
+    @test_throws MLJBalancing.ERR_NUM_ARGS_BM BalancedModel(model, model; balancer1=balancer1)
+    @test_logs (:warn, MLJBalancing.WRN_MODEL_GIVEN) begin
+        BalancedModel(model; model=model, balancer1=balancer1)
+    end
 end
