@@ -125,7 +125,8 @@ for model_type in SUPPORTED_MODEL_TYPES
     eval(ex)
 end
 
-const ERR_NO_PROP = ErrorException("trying to access property $name which does not exist")
+
+const ERR_NO_PROP = ArgumentError("trying to access property $name which does not exist")
 # overload set property to set the property from the vector in the struct
 for model_type in SUPPORTED_MODEL_TYPES
     struct_name = MODELTYPE_TO_COMPOSITETYPE[model_type]

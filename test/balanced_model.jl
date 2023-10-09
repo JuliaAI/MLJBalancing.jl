@@ -39,11 +39,10 @@
 	@test_throws  MLJBalancing.ERR_MODEL_UNSPECIFIED begin
 		BalancedModel(b1 = balancer1, b2 = balancer2, b3 = balancer3)
 	end
-
-	# ERR_UNSUPPORTED_MODEL(model)
-	@test_throws (MLJBalancing.ERR_UNSUPPORTED_MODEL(1)) begin
-		BalancedModel(model = 1, b1 = balancer1, b2 = balancer2, b3 = balancer3)
-	end
+    @test_throws(
+        MLJBalancing.ERR_UNSUPPORTED_MODEL(1),
+        BalancedModel(model = 1, b1 = balancer1, b2 = balancer2, b3 = balancer3),
+    )
 	@test_logs (:warn, MLJBalancing.WRN_BALANCER_UNSPECIFIED) begin
 		BalancedModel(model = model_prob)
 	end
@@ -81,9 +80,10 @@
 	Base.getproperty(balanced_model, :b1) == balancer1
 	Base.setproperty!(balanced_model, :b1, balancer2)
 	Base.getproperty(balanced_model, :b1) == balancer2
-	@test_throws MLJBalancing.ERR_NO_PROP begin
-		Base.setproperty!(balanced_model, :name11, balancer2)
-	end
+    @test_throws(
+        MLJBalancing.ERR_NO_PROP,
+	Base.setproperty!(balanced_model, :name11, balancer2),
+    )
 end
 
 
