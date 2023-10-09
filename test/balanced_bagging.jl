@@ -119,5 +119,21 @@ end
     mach = machine(modelo, X, y)
     fit!(mach)
     @test report(mach) == (chosen_T = 5,)
+end
 
+
+
+
+@testset "Equivalence of Constructions" begin
+    ## setup parameters
+    R = Random.Xoshiro(42)
+    T = 2
+    LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
+    model = LogisticClassifier()
+    BalancedBaggingClassifier(model=model, T=T, rng=R) == BalancedBaggingClassifier(model; T=T, rng=R)
+
+    @test_throws MLJBalancing.ERR_NUM_ARGS_BB BalancedBaggingClassifier(model, model; T=T, rng=R)
+    @test_logs (:warn, MLJBalancing.WRN_MODEL_GIVEN) begin
+        BalancedBaggingClassifier(model; model=model, T=T, rng=R)
+    end
 end

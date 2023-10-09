@@ -66,10 +66,12 @@ const ERR_UNSUPPORTED_MODEL(model) = ErrorException(
     "$PRETTY_SUPPORTED_MODEL_TYPES.\n"*
     "Model provided has type `$(typeof(model))`. "
 )
+const ERR_NUM_ARGS_BM = "`BalancedModel` can at most have one non-keyword argument where the model is passed."                
 
 
 """
-    BalancedModel(; balancers=[], model=nothing)
+    BalancedModel(; model=nothing, balancer1=balancer_model1, balancer2=balancer_model2, ...)
+    BalancedModel(model;  balancer1=balancer_model1, balancer2=balancer_model2, ...)
 
 Wraps a classification model with balancers that resample the data before passing it to the model.
 
@@ -77,11 +79,18 @@ Wraps a classification model with balancers that resample the data before passin
 - `balancers::AbstractVector=[]`: A vector of balancers (i.e., resampling models). 
     Data passed to the model will be first passed to the balancers sequentially.
 - `model=nothing`: The classification model which must be provided.
-
 """
-function BalancedModel(; model=nothing, named_balancers...)
+function BalancedModel(args...; model=nothing, named_balancers...)
     # check model and balancer are given
-    model === nothing && throw(ERR_MODEL_UNSPECIFIED)
+    length(args) <= 1 || throw(ERR_NUM_ARGS_BM)
+    if length(args) === 1
+        atom = first(args)
+        model === nothing ||
+            @warn WRN_MODEL_GIVEN
+        model = atom
+    else
+        model === nothing && throw(ERR_MODEL_UNSPECIFIED)
+    end
     # check model is supported
     model isa UNION_MODEL_TYPES  || throw(ERR_UNSUPPORTED_MODEL(model))
 

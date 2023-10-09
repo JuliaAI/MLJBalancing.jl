@@ -85,3 +85,18 @@
 		Base.setproperty!(balanced_model, :name11, balancer2)
 	end
 end
+
+
+@testset "Equivalence of Constructions" begin
+    ## setup parameters
+    R = Random.Xoshiro(42)
+    LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
+	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = 42)
+    model = LogisticClassifier()
+    BalancedModel(model=model, balancer1=balancer1) == BalancedModel(model; balancer1=balancer1)
+
+    @test_throws MLJBalancing.ERR_NUM_ARGS_BM BalancedModel(model, model; balancer1=balancer1)
+    @test_logs (:warn, MLJBalancing.WRN_MODEL_GIVEN) begin
+        BalancedModel(model; model=model, balancer1=balancer1)
+    end
+end
