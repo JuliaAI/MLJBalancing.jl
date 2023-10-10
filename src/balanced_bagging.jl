@@ -79,10 +79,10 @@ mutable struct BalancedBaggingClassifier{RI<:Union{AbstractRNG, Integer},I<:Inte
     rng::RI
 end
 
-rng_handler(rng::Integer) = Random.Xoshiro(rng)
-rng_handler(rng::AbstractRNG) = rng
 # To support Julia 1.6 which does not have Xoshiro
 XoshiroOrMT(rng::Integer) = (VERSION < v"1.7") ? Random.MersenneTwister(rng) : Random.Xoshiro(rng)
+rng_handler(rng::Integer) = XoshiroOrMT(rng)
+rng_handler(rng::AbstractRNG) = rng
 
 const ERR_MISSING_CLF = "No model specified. Please specify a probabilistic classifier using the `model` keyword argument."
 const ERR_BAD_T = "The number of ensemble models `T` cannot be negative."
