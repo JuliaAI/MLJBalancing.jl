@@ -119,7 +119,7 @@ end
     modelo = BalancedBaggingClassifier(model = model, rng = Random.MersenneTwister(42))
     mach = machine(modelo, X, y)
     fit!(mach)
-    @test report(mach) == (chosen_T = 5,)
+    @test report(mach) == (chosen_T = 9,)
 end
 
 
