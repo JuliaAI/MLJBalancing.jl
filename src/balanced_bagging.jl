@@ -81,6 +81,9 @@ end
 
 rng_handler(rng::Integer) = Random.Xoshiro(rng)
 rng_handler(rng::AbstractRNG) = rng
+# To support Julia 1.6 which does not have Xoshiro
+XoshiroOrMT(rng::Integer) = (VERSION < v"1.7") ? Random.MersenneTwister(rng) : Random.Xoshiro(rng)
+
 const ERR_MISSING_CLF = "No model specified. Please specify a probabilistic classifier using the `model` keyword argument."
 const ERR_BAD_T = "The number of ensemble models `T` cannot be negative."
 const INFO_DEF_T(T_def) = "The number of ensemble models was not given and was thus, automatically set to $T_def"*
@@ -219,8 +222,8 @@ Train the machine with `fit!(mach, rows=...)`.
 - `T::Integer=0`: The number of bags to be used in the ensemble. If not given, will be set as
     the ratio between the frequency of the majority and minority classes. Can be later found in `report(mach)`.
 
-- `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer`
-seed to be used with `Xoshiro`
+- `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer` 
+    seed to be used with `Xoshiro` if the Julia `VERSION>=1.7`. Otherwise, uses MersenneTwister`.
 
 # Operations
 

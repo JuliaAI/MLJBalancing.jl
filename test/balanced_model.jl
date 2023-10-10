@@ -4,7 +4,7 @@
 	X, y = generate_imbalanced_data(100, 5; class_probs = [0.2, 0.3, 0.5])
 	X = DataFrame(X)
 	train_inds, test_inds =
-		partition(eachindex(y), 0.8, shuffle = true, stratify = y, rng = Random.Xoshiro(42))
+		partition(eachindex(y), 0.8, shuffle = true, stratify = y, rng = Random.MersenneTwister(42))
 	X_train, X_test = X[train_inds, :], X[test_inds, :]
 	y_train, y_test = y[train_inds], y[test_inds]
 
@@ -89,7 +89,7 @@ end
 
 @testset "Equivalence of Constructions" begin
     ## setup parameters
-    R = Random.Xoshiro(42)
+    R = Random.MersenneTwister(42)
     LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
 	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = 42)
     model = LogisticClassifier()
