@@ -18,9 +18,9 @@
 	# And here are three resamplers from Imbalance. 
 	# The package should actually work with any `Static` transformer of the form  `(X, y) -> (Xout, yout)`
 	# provided that it implements the MLJ interface. Here, the balancer is the transformer
-	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = 42)
-	balancer2 = Imbalance.MLJ.SMOTENC(k = 10, ratios = 1.2, rng = 42)
-	balancer3 = Imbalance.MLJ.ROSE(ratios = 1.3, rng = 42)
+	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = Random.MeresenneTwister(42))
+	balancer2 = Imbalance.MLJ.SMOTENC(k = 10, ratios = 1.2, rng = Random.MeresenneTwister(42))
+	balancer3 = Imbalance.MLJ.ROSE(ratios = 1.3, rng = Random.MeresenneTwister(42))
 
 	### 1. Make a pipeline of the three balancers and a probablistic model
 	## ordinary way
@@ -91,7 +91,7 @@ end
     ## setup parameters
     R = Random.MersenneTwister(42)
     LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
-	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = 42)
+	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = Random.MersenneTwister(42))
     model = LogisticClassifier()
     BalancedModel(model=model, balancer1=balancer1) == BalancedModel(model; balancer1=balancer1)
 
