@@ -5,7 +5,7 @@ using MLJModelInterface
 using MLUtils
 using OrderedCollections
 using Random
-using Random: AbstractRNG, Xoshiro, rand
+using Random: AbstractRNG, rand
 using StatsBase: sample
 
 MMI = MLJModelInterface

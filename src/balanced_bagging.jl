@@ -223,7 +223,7 @@ Train the machine with `fit!(mach, rows=...)`.
     the ratio between the frequency of the majority and minority classes. Can be later found in `report(mach)`.
 
 - `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer` 
-    seed to be used with `Xoshiro` if the Julia `VERSION>=1.7`. Otherwise, uses MersenneTwister`.
+    seed to be used with `Xoshiro` if Julia `VERSION>=1.7`. Otherwise, uses MersenneTwister`.
 
 # Operations
 
