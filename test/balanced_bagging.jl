@@ -18,7 +18,7 @@ end
         num_vals_per_category = [3, 2, 1, 2],
         class_probs = [0.9, 0.1],
         type = "ColTable",
-        rng = 42,
+        rng = Random.MersenneTwister(42),
     )
     majority_inds, minority_inds, majority_count, minority_count =
         MLJBalancing.get_majority_minority_inds_counts(y)
@@ -64,7 +64,7 @@ end
         num_vals_per_category = [3, 2, 1, 2],
         class_probs = [0.9, 0.1],
         type = "ColTable",
-        rng = 42,
+        rng = Random.MersenneTwister(42),
     )
     # testing
     Xt, yt = generate_imbalanced_data(
@@ -73,7 +73,7 @@ end
         num_vals_per_category = [3, 2, 1, 2],
         class_probs = [0.9, 0.1],
         type = "ColTable",
-        rng = 42,
+        rng = Random.MersenneTwister(42),
     )
 
     ## prepare subsets
