@@ -1,10 +1,10 @@
 @testset "BalancedModel" begin
 	### end-to-end test
 	# Create and split data
-	X, y = generate_imbalanced_data(100, 5; class_probs = [0.2, 0.3, 0.5])
+	X, y = generate_imbalanced_data(100, 5; class_probs = [0.2, 0.3, 0.5], rng=Random.MersenneTwister(42))
 	X = DataFrame(X)
 	train_inds, test_inds =
-		partition(eachindex(y), 0.8, shuffle = true, stratify = y, rng = Random.Xoshiro(42))
+		partition(eachindex(y), 0.8, shuffle = true, stratify = y, rng = Random.MersenneTwister(42))
 	X_train, X_test = X[train_inds, :], X[test_inds, :]
 	y_train, y_test = y[train_inds], y[test_inds]
 
@@ -18,9 +18,9 @@
 	# And here are three resamplers from Imbalance. 
 	# The package should actually work with any `Static` transformer of the form  `(X, y) -> (Xout, yout)`
 	# provided that it implements the MLJ interface. Here, the balancer is the transformer
-	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = 42)
-	balancer2 = Imbalance.MLJ.SMOTENC(k = 10, ratios = 1.2, rng = 42)
-	balancer3 = Imbalance.MLJ.ROSE(ratios = 1.3, rng = 42)
+	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = Random.MersenneTwister(42))
+	balancer2 = Imbalance.MLJ.SMOTENC(k = 10, ratios = 1.2, rng = Random.MersenneTwister(42))
+	balancer3 = Imbalance.MLJ.ROSE(ratios = 1.3, rng = Random.MersenneTwister(42))
 
 	### 1. Make a pipeline of the three balancers and a probablistic model
 	## ordinary way
@@ -89,9 +89,9 @@ end
 
 @testset "Equivalence of Constructions" begin
     ## setup parameters
-    R = Random.Xoshiro(42)
+    R = Random.MersenneTwister(42)
     LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
-	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = 42)
+	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = Random.MersenneTwister(42))
     model = LogisticClassifier()
     BalancedModel(model=model, balancer1=balancer1) == BalancedModel(model; balancer1=balancer1)
 
