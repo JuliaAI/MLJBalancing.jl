@@ -84,8 +84,8 @@ Given a classification model, and one or more balancer models that all implement
 
 # Arguments
 - `model::Supervised`: A classification model that implements the `MLJModelInterface`. 
-- `balancer1::Static=...`: The first balancer model to pass the data to. This keyword argument can have any name.
-- `balancer2::Static=...`: The second balancer model to pass the data to. This keyword argument can have any name.
+- `balancer1::Static=...`: The first balancer model to pass the data to. Expected to be a `static` transformer that implements the `MLJModelInterface` and operates on `X, y` data. This keyword argument can have any name.
+- `balancer2::Static=...`: The second balancer model to pass the data to. Expected to be a `static` transformer that implements the `MLJModelInterface` and operates on `X, y` data. This keyword argument can have any name.
 - and so on for an arbitrary number of balancers.
 
 # Returns
