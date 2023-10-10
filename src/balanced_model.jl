@@ -55,33 +55,78 @@ const UNION_MODEL_TYPES = Union{keys(MODELTYPE_TO_COMPOSITETYPE_EVAL)...}
 
 
 # Possible Errors (for the constructor as well)
-const ERR_MODEL_UNSPECIFIED = ArgumentError("Expected an atomic model as argument. None specified. ")
+const ERR_MODEL_UNSPECIFIED = ErrorException("Expected an atomic model as argument. None specified. ")
 
 const WRN_BALANCER_UNSPECIFIED = "No balancer was provided. Data will be directly passed to the model. "
 
 const PRETTY_SUPPORTED_MODEL_TYPES = join([string("`", opt, "`") for opt in SUPPORTED_MODEL_TYPES], ", ",", and ")
 
-const ERR_UNSUPPORTED_MODEL(model) = ArgumentError(
+const ERR_UNSUPPORTED_MODEL(model) = ErrorException(
     "Only these model supertypes support wrapping: "*
     "$PRETTY_SUPPORTED_MODEL_TYPES.\n"*
     "Model provided has type `$(typeof(model))`. "
 )
+const ERR_NUM_ARGS_BM = "`BalancedModel` can at most have one non-keyword argument where the model is passed."                
 
 
 """
-    BalancedModel(; balancers=[], model=nothing)
+    BalancedModel(; model=nothing, balancer1=balancer_model1, balancer2=balancer_model2, ...)
+    BalancedModel(model;  balancer1=balancer_model1, balancer2=balancer_model2, ...)
 
-Wraps a classification model with balancers that resample the data before passing it to the model.
+Given a classification model, and one or more balancer models that all implement the `MLJModelInterface`,
+    `BalancedModel` allows constructing a sequential pipeline that wraps an arbitrary number of balancing models 
+    and a classifier together in a sequential pipeline.
+
+# Operation
+- During training, data is first passed to `balancer1` and the result is passed to `balancer2` and so on, the result from the final balancer
+    is then passed to the classifier for training.
+- During prediction, the balancers have no effect.
 
 # Arguments
-- `balancers::AbstractVector=[]`: A vector of balancers (i.e., resampling models). 
-    Data passed to the model will be first passed to the balancers sequentially.
-- `model=nothing`: The classification model which must be provided.
+- `model::Supervised`: A classification model that implements the `MLJModelInterface`. 
+- `balancer1::Static=...`: The first balancer model to pass the data to. This keyword argument can have any name.
+- `balancer2::Static=...`: The second balancer model to pass the data to. This keyword argument can have any name.
+- and so on for an arbitrary number of balancers.
 
+# Returns
+- An instance of type ProbabilisticBalancedModel or DeterministicBalancedModel, depending on the prediction type of model.
+
+# Example
+```julia
+using MLJ
+using Imbalance
+
+# generate data
+X, y = Imbalance.generate_imbalanced_data(1000, 5; class_probs=[0.2, 0.3, 0.5])
+
+# prepare classification and balancing models
+SMOTENC = @load SMOTENC pkg=Imbalance verbosity=0
+TomekUndersampler = @load TomekUndersampler pkg=Imbalance verbosity=0
+LogisticClassifier = @load LogisticClassifier pkg=MLJLinearModels verbosity=0
+
+oversampler = SMOTENC(k=5, ratios=1.0, rng=42)
+undersampler = TomekUndersampler(min_ratios=0.5, rng=42)
+logistic_model = LogisticClassifier()
+
+# wrap them in a BalancedModel
+balanced_model = BalancedModel(model=logistic_model, balancer1=oversampler, balancer2=undersampler)
+
+# now this behaves as a unified model that can be trained, validated, fine-tuned, etc.
+mach = machine(balanced_model, X, y)
+fit!(mach)
+```
 """
-function BalancedModel(; model=nothing, named_balancers...)
+function BalancedModel(args...; model=nothing, named_balancers...)
     # check model and balancer are given
-    model === nothing && throw(ERR_MODEL_UNSPECIFIED)
+    length(args) <= 1 || throw(ERR_NUM_ARGS_BM)
+    if length(args) === 1
+        atom = first(args)
+        model === nothing ||
+            @warn WRN_MODEL_GIVEN
+        model = atom
+    else
+        model === nothing && throw(ERR_MODEL_UNSPECIFIED)
+    end
     # check model is supported
     model isa UNION_MODEL_TYPES  || throw(ERR_UNSUPPORTED_MODEL(model))
 
@@ -115,6 +160,7 @@ for model_type in SUPPORTED_MODEL_TYPES
     end
     eval(ex)
 end
+
 
 const ERR_NO_PROP = ArgumentError("trying to access property $name which does not exist")
 # overload set property to set the property from the vector in the struct

@@ -79,20 +79,34 @@ mutable struct BalancedBaggingClassifier{RI<:Union{AbstractRNG, Integer},I<:Inte
     rng::RI
 end
 
-rng_handler(rng::Integer) = Random.Xoshiro(rng)
+# To support Julia 1.6 which does not have Xoshiro
+XoshiroOrMT(rng::Integer) = (VERSION < v"1.7") ? Random.MersenneTwister(rng) : Random.Xoshiro(rng)
+rng_handler(rng::Integer) = XoshiroOrMT(rng)
 rng_handler(rng::AbstractRNG) = rng
+
 const ERR_MISSING_CLF = "No model specified. Please specify a probabilistic classifier using the `model` keyword argument."
 const ERR_BAD_T = "The number of ensemble models `T` cannot be negative."
 const INFO_DEF_T(T_def) = "The number of ensemble models was not given and was thus, automatically set to $T_def"*
                           " which is the ratio of the frequency of the majority class to that of the minority class"
-function BalancedBaggingClassifier(;
+const ERR_NUM_ARGS_BB = "`BalancedBaggingClassifier` can at most have one non-keyword argument where the model is passed."                
+const WRN_MODEL_GIVEN = "Ignoring keyword argument `model=...` as model already given as positional argument. "
+
+function BalancedBaggingClassifier(args...;
     model = nothing,
     T = 0,
     rng = Random.default_rng(),
 )
-    model === nothing && error(ERR_MISSING_CLF)
-    T < 0 && error(ERR_BAD_T)
-    rng = rng_handler(rng)
+    length(args) <= 1 || throw(ERR_NUM_ARGS_BB)
+    if length(args) === 1
+        atom = first(args)
+        model === nothing ||
+            @warn WRN_MODEL_GIVEN
+        model = atom
+    else
+        model === nothing && throw(ERR_MISSING_CLF)
+    end
+    T < 0 && error(ERR_BAD_T)      
+    rng = rng_handler(rng)    
     return BalancedBaggingClassifier(model, T, rng)
 end
 
@@ -208,8 +222,8 @@ Train the machine with `fit!(mach, rows=...)`.
 - `T::Integer=0`: The number of bags to be used in the ensemble. If not given, will be set as
     the ratio between the frequency of the majority and minority classes. Can be later found in `report(mach)`.
 
-- `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer`
-seed to be used with `Xoshiro`
+- `rng::Union{AbstractRNG, Integer}=default_rng()`: Either an `AbstractRNG` object or an `Integer` 
+    seed to be used with `Xoshiro` if Julia `VERSION>=1.7`. Otherwise, uses MersenneTwister`.
 
 # Operations
 

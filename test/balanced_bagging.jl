@@ -1,7 +1,7 @@
 
 @testset "group_inds and get_majority_minority_inds_counts" begin
     y = [0, 0, 0, 0, 1, 1, 1, 0]
-    @test MLJBalancing.group_inds(y) == Dict(0 => [1, 2, 3, 4, 8], 1 => [5, 6, 7])
+    @test MLJBalancing.group_inds(y) == Dict(0 => [1, 2, 3, 4, 8], 1 => [5, 6,  7])
     @test MLJBalancing.get_majority_minority_inds_counts(y) ==
           ([1, 2, 3, 4, 8], [5, 6, 7], 5, 3)
     y = [0, 0, 0, 0, 1, 1, 1, 0, 2, 2, 2]
@@ -18,7 +18,7 @@ end
         num_vals_per_category = [3, 2, 1, 2],
         class_probs = [0.9, 0.1],
         type = "ColTable",
-        rng = 42,
+        rng = Random.MersenneTwister(42),
     )
     majority_inds, minority_inds, majority_count, minority_count =
         MLJBalancing.get_majority_minority_inds_counts(y)
@@ -30,7 +30,7 @@ end
         minority_inds,
         majority_count,
         minority_count,
-        Random.Xoshiro(42)
+        Random.MersenneTwister(42)
     )
     X_sub, y_sub = X_sub(rows = 1:100), y_sub(rows = 1:100)
     majority_inds_sub, minority_inds_sub, _, _ =
@@ -51,7 +51,7 @@ end
 
 @testset "End-to-end Test" begin
     ## setup parameters
-    R = Random.Xoshiro(42)
+    R = Random.MersenneTwister(42)
     T = 2
     LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
     model = LogisticClassifier()
@@ -64,7 +64,7 @@ end
         num_vals_per_category = [3, 2, 1, 2],
         class_probs = [0.9, 0.1],
         type = "ColTable",
-        rng = 42,
+        rng = Random.MersenneTwister(42),
     )
     # testing
     Xt, yt = generate_imbalanced_data(
@@ -73,7 +73,7 @@ end
         num_vals_per_category = [3, 2, 1, 2],
         class_probs = [0.9, 0.1],
         type = "ColTable",
-        rng = 42,
+        rng = Random.MersenneTwister(42),
     )
 
     ## prepare subsets
@@ -111,14 +111,30 @@ end
     pred_manual = mean([pred1, pred2])
 
     ## using BalancedBagging
-    modelo = BalancedBaggingClassifier(model = model, T = 2, rng = Random.Xoshiro(42))
+    modelo = BalancedBaggingClassifier(model = model, T = 2, rng = Random.MersenneTwister(42))
     mach = machine(modelo, X, y)
     fit!(mach)
     pred_auto = MLJBase.predict(mach, Xt)
     @test sum(pred_manual) ≈ sum(pred_auto)
-    modelo = BalancedBaggingClassifier(model = model, rng = Random.Xoshiro(42))
+    modelo = BalancedBaggingClassifier(model = model, rng = Random.MersenneTwister(42))
     mach = machine(modelo, X, y)
     fit!(mach)
-    @test report(mach) == (chosen_T = 5,)
+    @test report(mach) == (chosen_T = 9,)
+end
 
+
+
+
+@testset "Equivalence of Constructions" begin
+    ## setup parameters
+    R = Random.MersenneTwister(42)
+    T = 2
+    LogisticClassifier = @load LogisticClassifier pkg = MLJLinearModels verbosity = 0
+    model = LogisticClassifier()
+    BalancedBaggingClassifier(model=model, T=T, rng=R) == BalancedBaggingClassifier(model; T=T, rng=R)
+
+    @test_throws MLJBalancing.ERR_NUM_ARGS_BB BalancedBaggingClassifier(model, model; T=T, rng=R)
+    @test_logs (:warn, MLJBalancing.WRN_MODEL_GIVEN) begin
+        BalancedBaggingClassifier(model; model=model, T=T, rng=R)
+    end
 end
