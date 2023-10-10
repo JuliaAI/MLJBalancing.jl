@@ -18,9 +18,9 @@
 	# And here are three resamplers from Imbalance. 
 	# The package should actually work with any `Static` transformer of the form  `(X, y) -> (Xout, yout)`
 	# provided that it implements the MLJ interface. Here, the balancer is the transformer
-	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = Random.MeresenneTwister(42))
-	balancer2 = Imbalance.MLJ.SMOTENC(k = 10, ratios = 1.2, rng = Random.MeresenneTwister(42))
-	balancer3 = Imbalance.MLJ.ROSE(ratios = 1.3, rng = Random.MeresenneTwister(42))
+	balancer1 = Imbalance.MLJ.RandomOversampler(ratios = 1.0, rng = Random.MersenneTwister(42))
+	balancer2 = Imbalance.MLJ.SMOTENC(k = 10, ratios = 1.2, rng = Random.MersenneTwister(42))
+	balancer3 = Imbalance.MLJ.ROSE(ratios = 1.3, rng = Random.MersenneTwister(42))
 
 	### 1. Make a pipeline of the three balancers and a probablistic model
 	## ordinary way
