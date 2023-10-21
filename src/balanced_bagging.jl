@@ -69,9 +69,6 @@ function get_some_balanced_subset(
 end
 
 
-"""
-Construct an BalancedBaggingClassifier model.
-"""
 mutable struct BalancedBaggingClassifier{RI<:Union{AbstractRNG, Integer},I<:Integer,P<:Probabilistic} <:
                ProbabilisticNetworkComposite
     model::P
