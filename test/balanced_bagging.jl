@@ -120,6 +120,10 @@ end
     mach = machine(modelo, X, y)
     fit!(mach)
     @test report(mach) == (chosen_T = 9,)
+
+    ## traits
+    @test fit_data_scitype(modelo) == fit_data_scitype(model)
+    @test is_wrapper(modelo) 
 end
 
 
