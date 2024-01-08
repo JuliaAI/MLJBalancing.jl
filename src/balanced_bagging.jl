@@ -144,17 +144,16 @@ MMI.metadata_pkg(
     package_uuid = "45f359ea-796d-4f51-95a5-deb1a414c586",
     package_url = "https://github.com/JuliaAI/MLJBalancing.jl",
     is_pure_julia = true,
+    is_wrapper = true,
 )
 
 MMI.metadata_model(
     BalancedBaggingClassifier,
-    input_scitype = Union{Union{Infinite,Finite}},
-    output_scitype = Union{Union{Infinite,Finite}},
-    target_scitype = AbstractVector,
+    target_scitype = AbstractVector{<:Finite},
     load_path = "MLJBalancing." * string(BalancedBaggingClassifier),
 )
 
-MMI.iteration_parameter(::Type{<:BalancedBaggingClassifier{P}}) where {P} =
+MMI.iteration_parameter(::Type{<:BalancedBaggingClassifier{<:Any,<:Any,P}}) where P =
     MLJBase.prepend(:model, iteration_parameter(P))
 for trait in [
     :input_scitype,
@@ -173,7 +172,8 @@ for trait in [
     :prediction_type,
 ]
     quote
-        MMI.$trait(::Type{<:BalancedBaggingClassifier{P}}) where {P} = MMI.$trait(P)
+        MMI.$trait(::Type{<:BalancedBaggingClassifier{<:Any,<:Any, P}}) where {P} =
+            MMI.$trait(P)
     end |> eval
 end
 
