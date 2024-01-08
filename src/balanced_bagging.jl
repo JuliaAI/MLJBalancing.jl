@@ -133,7 +133,7 @@ function MLJBase.prefit(composite_model::BalancedBaggingClassifier, verbosity, X
     machines = (machine(:model, Xsub, ysub) for (Xsub, ysub) in X_y_list_s)
     # Average the predictions from nodes
     all_preds = [MLJBase.predict(mach, Xs) for (mach, (X, _)) in zip(machines, X_y_list_s)]
-;    yhat = mean(all_preds)
+    yhat = mean(all_preds)
     return (; predict=yhat, report=(;chosen_T=node(()->T)))
 end
 
