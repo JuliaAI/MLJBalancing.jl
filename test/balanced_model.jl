@@ -52,7 +52,12 @@
 	fit!(mach)
 	y_pred2 = MLJBase.predict(mach, X_test)
 
-	@test y_pred ≈ y_pred2
+        @test y_pred ≈ y_pred2
+
+        # traits:
+        @test fit_data_scitype(balanced_model) ==  fit_data_scitype(model_prob)
+        @test is_wrapper(balanced_model)
+    
 
 	### 2. Make a pipeline of the three balancers and a deterministic model
 	## ordinary way
