@@ -9,7 +9,7 @@ Pkg.add("MLJBalancing")
 
 ## 🚅 Sequential Resampling
 
-This package allows chaining of resampling methods from Imbalance.jl with classification models from MLJ. Simply construct a `BalancedModel` object while specifying the model (classifier) and an arbitrary number of resamplers (also called *balancers* - typically oversamplers and/or under samplers).
+This package allows chaining of resampling methods from `Imbalance.jl` with classification models from `MLJ`. Simply construct a `BalancedModel` object while specifying the model (classifier) and an arbitrary number of resamplers (also called *balancers* - typically oversamplers and/or undersamplers).
 
 ### 📖 Example
 
@@ -29,12 +29,12 @@ logistic_model = LogisticClassifier()
 ```julia
 balanced_model = BalancedModel(model=logistic_model, balancer1=oversampler, balancer2=undersampler)
 ```
-Here training data will be passed to `balancer1` then `balancer2`, whose output is used to train the classifier `model`.  In prediction, the resamplers `balancer1` and `blancer2` are bypassed. 
+Here training data will be passed to `balancer1` then `balancer2`, whose output is used to train the classifier `model`.  When `balanced_model` is used for prediction, the resamplers `balancer1` and `blancer2` are bypassed. 
 
-In general, there can be any number of balancers, and the user can give the balancers arbitrary names. 
+In general, any number of balancers can be passed to the function, and the user can give the balancers arbitrary names while passing them. 
 
-#### At this point, they behave like one single model
-You can fit, predict, cross-validate and fine-tune it like any other MLJ model. Here is an example for fine-tuning
+#### At this point, `balanced_model` behaves like one single model
+You can fit, predict, cross-validate and hyperparamter tune it like any other MLJ model. Here is an example for hyperparameter tuning:
 ```julia
 r1 = range(balanced_model, :(balancer1.k), lower=3, upper=10)
 r2 = range(balanced_model, :(balancer2.min_ratios), lower=0.1, upper=0.9)
@@ -67,7 +67,7 @@ bagging_model = BalancedBaggingClassifier(model=logistic_model, T=10, rng=Random
 ```
 
 #### Now it behaves like one single model
-You can fit, predict, cross-validate and fine-tune it like any other probabilistic MLJ model where `X` must be a table input (e.g., a dataframe).
+You can fit, predict, cross-validate and hyperparameter-tune it like any other probabilistic MLJ model where `X` must be a table input (e.g., a dataframe).
 ```julia
 mach = machine(bagging_model, X, y)
 fit!(mach)
