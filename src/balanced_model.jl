@@ -7,8 +7,8 @@ struct BalancedModel <:ProbabilisticNetworkComposite
     model::Probabilistic         # get rid of abstract types
 end
 
-BalancedModel(;model=nothing, balancer=nothing) = BalancedModel(model, balancer) 
-BalancedModel(model; kwargs...) = BalancedModel(; model, kwargs...)    
+BalancedModel(;model=nothing, balancer=nothing) = BalancedModel(model, balancer)
+BalancedModel(model; kwargs...) = BalancedModel(; model, kwargs...)
 
 In the following, we use macros to automate code generation of these for all model
 types
@@ -66,7 +66,7 @@ const ERR_UNSUPPORTED_MODEL(model) = ErrorException(
     "$PRETTY_SUPPORTED_MODEL_TYPES.\n"*
     "Model provided has type `$(typeof(model))`. "
 )
-const ERR_NUM_ARGS_BM = "`BalancedModel` can at most have one non-keyword argument where the model is passed."                
+const ERR_NUM_ARGS_BM = "`BalancedModel` can at most have one non-keyword argument where the model is passed."
 
 
 """
@@ -74,7 +74,7 @@ const ERR_NUM_ARGS_BM = "`BalancedModel` can at most have one non-keyword argume
     BalancedModel(model;  balancer1=balancer_model1, balancer2=balancer_model2, ...)
 
 Given a classification model, and one or more balancer models that all implement the `MLJModelInterface`,
-    `BalancedModel` allows constructing a sequential pipeline that wraps an arbitrary number of balancing models 
+    `BalancedModel` allows constructing a sequential pipeline that wraps an arbitrary number of balancing models
     and a classifier together in a sequential pipeline.
 
 # Operation
@@ -83,7 +83,7 @@ Given a classification model, and one or more balancer models that all implement
 - During prediction, the balancers have no effect.
 
 # Arguments
-- `model::Supervised`: A classification model that implements the `MLJModelInterface`. 
+- `model::Supervised`: A classification model that implements the `MLJModelInterface`.
 - `balancer1::Static=...`: The first balancer model to pass the data to. This keyword argument can have any name.
 - `balancer2::Static=...`: The second balancer model to pass the data to. This keyword argument can have any name.
 - and so on for an arbitrary number of balancers.
