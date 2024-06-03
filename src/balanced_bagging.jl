@@ -150,8 +150,9 @@ MMI.metadata_pkg(
 MMI.metadata_model(
     BalancedBaggingClassifier,
     target_scitype = AbstractVector{<:Finite},
-    load_path = "MLJBalancing." * string(BalancedBaggingClassifier),
+    load_path = "MLJBalancing.BalancedBaggingClassifier",
 )
+MMI.constructor(::Type{<:BalancedBaggingClassifier}) = BalancedBaggingClassifier
 
 MMI.iteration_parameter(::Type{<:BalancedBaggingClassifier{<:Any,<:Any,P}}) where P =
     MLJBase.prepend(:model, iteration_parameter(P))
