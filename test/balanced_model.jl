@@ -39,15 +39,17 @@
         @test_throws  MLJBalancing.ERR_MODEL_UNSPECIFIED begin
                 BalancedModel(b1 = balancer1, b2 = balancer2, b3 = balancer3)
         end
-    @test_throws(
-        MLJBalancing.ERR_UNSUPPORTED_MODEL(1),
-        BalancedModel(model = 1, b1 = balancer1, b2 = balancer2, b3 = balancer3),
-    )
+        @test_throws(
+            MLJBalancing.ERR_UNSUPPORTED_MODEL(1),
+            BalancedModel(model = 1, b1 = balancer1, b2 = balancer2, b3 = balancer3),
+        )
         @test_logs (:warn, MLJBalancing.WRN_BALANCER_UNSPECIFIED) begin
                 BalancedModel(model = model_prob)
         end
         balanced_model =
-                BalancedModel(model = model_prob, b1 = balancer1, b2 = balancer2, b3 = balancer3)
+            BalancedModel(model = model_prob, b1 = balancer1, b2 = balancer2, b3 = balancer3)
+        @test constructor(balanced_model) == BalancedModel
+
         mach = machine(balanced_model, X_train, y_train)
         fit!(mach)
         y_pred2 = MLJBase.predict(mach, X_test)

@@ -216,14 +216,20 @@ MMI.package_name(::Type{<:UNION_COMPOSITE_TYPES}) = "MLJBalancing"
 MMI.package_license(::Type{<:UNION_COMPOSITE_TYPES}) = "MIT"
 MMI.package_uuid(::Type{<:UNION_COMPOSITE_TYPES}) = "45f359ea-796d-4f51-95a5-deb1a414c586"
 MMI.is_wrapper(::Type{<:UNION_COMPOSITE_TYPES}) = true
-MMI.package_url(::Type{<:UNION_COMPOSITE_TYPES}) ="https://github.com/JuliaAI/MLJBalancing.jl"
+MMI.package_url(::Type{<:UNION_COMPOSITE_TYPES}) =
+    "https://github.com/JuliaAI/MLJBalancing.jl"
+
+# load path should point to constructor:
+MMI.load_path(::Type{<:UNION_COMPOSITE_TYPES}) = "MLJBalancing.BalancedModel"
+MMI.constructor(::Type{<:UNION_COMPOSITE_TYPES}) = BalancedModel
 
 # All the composite types BalancedModelProbabilistic, BalancedModelDeterministic, etc.
 const COMPOSITE_TYPES = values(MODELTYPE_TO_COMPOSITETYPE)
 for composite_type in COMPOSITE_TYPES
     quote
-        MMI.iteration_parameter(::Type{<:$composite_type{balancernames, M}}) where {balancernames, M} =
-            MLJBase.prepend(:model, iteration_parameter(M))
+        MMI.iteration_parameter(
+            ::Type{<:$composite_type{balancernames, M}},
+        ) where {balancernames, M} = MLJBase.prepend(:model, iteration_parameter(M))
     end |> eval
     for trait in [
         :input_scitype,
@@ -241,7 +247,9 @@ for composite_type in COMPOSITE_TYPES
         :is_supervised,
         :prediction_type]
         quote
-            MMI.$trait(::Type{<:$composite_type{balancernames, M}}) where {balancernames, M} = MMI.$trait(M)
+            MMI.$trait(
+                ::Type{<:$composite_type{balancernames, M}},
+            ) where {balancernames, M} = MMI.$trait(M)
         end |> eval
     end
 end
