@@ -1,4 +1,3 @@
-
 @testset "group_inds and get_majority_minority_inds_counts" begin
     y = [0, 0, 0, 0, 1, 1, 1, 0]
     @test MLJBalancing.group_inds(y) == Dict(0 => [1, 2, 3, 4, 8], 1 => [5, 6,  7])
@@ -111,7 +110,11 @@ end
     pred_manual = mean([pred1, pred2])
 
     ## using BalancedBagging
-    modelo = BalancedBaggingClassifier(model = model, T = 2, rng = Random.MersenneTwister(42))
+    modelo = BalancedBaggingClassifier(
+        model = model,
+        T = 2,
+        rng = Random.MersenneTwister(42),
+    )
     mach = machine(modelo, X, y)
     fit!(mach)
     pred_auto = MLJBase.predict(mach, Xt)
@@ -123,7 +126,10 @@ end
 
     ## traits
     @test fit_data_scitype(modelo) == fit_data_scitype(model)
-    @test is_wrapper(modelo) 
+    @test is_wrapper(modelo)
+    @test constructor(modelo) == BalancedBaggingClassifier
+    @test package_name(modelo) == "MLJBalancing"
+    @test load_path(modelo) == "MLJBalancing.BalancedBaggingClassifier"
 end
 
 

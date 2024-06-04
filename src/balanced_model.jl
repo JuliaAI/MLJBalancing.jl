@@ -7,8 +7,8 @@ struct BalancedModel <:ProbabilisticNetworkComposite
     model::Probabilistic         # get rid of abstract types
 end
 
-BalancedModel(;model=nothing, balancer=nothing) = BalancedModel(model, balancer) 
-BalancedModel(model; kwargs...) = BalancedModel(; model, kwargs...)    
+BalancedModel(;model=nothing, balancer=nothing) = BalancedModel(model, balancer)
+BalancedModel(model; kwargs...) = BalancedModel(; model, kwargs...)
 
 In the following, we use macros to automate code generation of these for all model
 types
@@ -66,7 +66,7 @@ const ERR_UNSUPPORTED_MODEL(model) = ErrorException(
     "$PRETTY_SUPPORTED_MODEL_TYPES.\n"*
     "Model provided has type `$(typeof(model))`. "
 )
-const ERR_NUM_ARGS_BM = "`BalancedModel` can at most have one non-keyword argument where the model is passed."                
+const ERR_NUM_ARGS_BM = "`BalancedModel` can at most have one non-keyword argument where the model is passed."
 
 
 """
@@ -74,7 +74,7 @@ const ERR_NUM_ARGS_BM = "`BalancedModel` can at most have one non-keyword argume
     BalancedModel(model;  balancer1=balancer_model1, balancer2=balancer_model2, ...)
 
 Given a classification model, and one or more balancer models that all implement the `MLJModelInterface`,
-    `BalancedModel` allows constructing a sequential pipeline that wraps an arbitrary number of balancing models 
+    `BalancedModel` allows constructing a sequential pipeline that wraps an arbitrary number of balancing models
     and a classifier together in a sequential pipeline.
 
 # Operation
@@ -83,7 +83,7 @@ Given a classification model, and one or more balancer models that all implement
 - During prediction, the balancers have no effect.
 
 # Arguments
-- `model::Supervised`: A classification model that implements the `MLJModelInterface`. 
+- `model::Supervised`: A classification model that implements the `MLJModelInterface`.
 - `balancer1::Static=...`: The first balancer model to pass the data to. This keyword argument can have any name.
 - `balancer2::Static=...`: The second balancer model to pass the data to. This keyword argument can have any name.
 - and so on for an arbitrary number of balancers.
@@ -216,14 +216,20 @@ MMI.package_name(::Type{<:UNION_COMPOSITE_TYPES}) = "MLJBalancing"
 MMI.package_license(::Type{<:UNION_COMPOSITE_TYPES}) = "MIT"
 MMI.package_uuid(::Type{<:UNION_COMPOSITE_TYPES}) = "45f359ea-796d-4f51-95a5-deb1a414c586"
 MMI.is_wrapper(::Type{<:UNION_COMPOSITE_TYPES}) = true
-MMI.package_url(::Type{<:UNION_COMPOSITE_TYPES}) ="https://github.com/JuliaAI/MLJBalancing.jl"
+MMI.package_url(::Type{<:UNION_COMPOSITE_TYPES}) =
+    "https://github.com/JuliaAI/MLJBalancing.jl"
+
+# load path should point to constructor:
+MMI.load_path(::Type{<:UNION_COMPOSITE_TYPES}) = "MLJBalancing.BalancedModel"
+MMI.constructor(::Type{<:UNION_COMPOSITE_TYPES}) = BalancedModel
 
 # All the composite types BalancedModelProbabilistic, BalancedModelDeterministic, etc.
 const COMPOSITE_TYPES = values(MODELTYPE_TO_COMPOSITETYPE)
 for composite_type in COMPOSITE_TYPES
     quote
-        MMI.iteration_parameter(::Type{<:$composite_type{balancernames, M}}) where {balancernames, M} =
-            MLJBase.prepend(:model, iteration_parameter(M))
+        MMI.iteration_parameter(
+            ::Type{<:$composite_type{balancernames, M}},
+        ) where {balancernames, M} = MLJBase.prepend(:model, iteration_parameter(M))
     end |> eval
     for trait in [
         :input_scitype,
@@ -241,7 +247,9 @@ for composite_type in COMPOSITE_TYPES
         :is_supervised,
         :prediction_type]
         quote
-            MMI.$trait(::Type{<:$composite_type{balancernames, M}}) where {balancernames, M} = MMI.$trait(M)
+            MMI.$trait(
+                ::Type{<:$composite_type{balancernames, M}},
+            ) where {balancernames, M} = MMI.$trait(M)
         end |> eval
     end
 end
